@@ -359,57 +359,57 @@ tresult PLUGIN_API IPlugVST3::setupProcessing (ProcessSetup& newSetup)
 
 tresult PLUGIN_API IPlugVST3::process(ProcessData& data)
 {
-  TRACE_PROCESS;
-
-  IMutexLock lock(this);
-
-  if(data.processContext)
-    memcpy(&mProcessContext, data.processContext, sizeof(ProcessContext));
-
-  //process parameters
-  IParameterChanges* paramChanges = data.inputParameterChanges;
-  if (paramChanges)
-  {
-    int32 numParamsChanged = paramChanges->getParameterCount();
-
-    //it is possible to get a finer resolution of control here by retrieving more values (points) from the queue
-    //for now we just grab the last one
-
-    for (int32 i = 0; i < numParamsChanged; i++)
-    {
-      IParamValueQueue* paramQueue = paramChanges->getParameterData(i);
-      if (paramQueue)
-      {
-        int32 numPoints = paramQueue->getPointCount();
-        int32 offsetSamples;
-        double value;
-
-        if (paramQueue->getPoint(numPoints - 1,  offsetSamples, value) == kResultTrue)
-        {
-          int idx = paramQueue->getParameterId();
-
-          switch (idx)
-          {
-            case kBypassParam:
-            {
-              bool bypassed = (value > 0.5);
-              
-              if (bypassed != mIsBypassed)
-              {
-                mIsBypassed = bypassed;
-              }
-
-              break;
-            }
-            case kPresetParam:
-              RestorePreset(FromNormalizedParam(value, 0, NPresets(), 1.));
-              break;
-            default:
-              if (idx >= 0 && idx < NParams())
-              {
-                GetParam(idx)->SetNormalized((double)value);
-                if (GetGUI()) GetGUI()->SetParameterFromPlug(idx, (double)value, true);
-                OnParamChange(idx);
+	TRACE_PROCESS;
+	
+	IMutexLock lock(this);
+	
+	if(data.processContext)
+		memcpy(&mProcessContext, data.processContext, sizeof(ProcessContext));
+	
+	//process parameters
+	IParameterChanges* paramChanges = data.inputParameterChanges;
+	if (paramChanges)
+	{
+		int32 numParamsChanged = paramChanges->getParameterCount();
+		
+		//it is possible to get a finer resolution of control here by retrieving more values (points) from the queue
+		//for now we just grab the last one
+		
+		for (int32 i = 0; i < numParamsChanged; i++)
+		{
+			IParamValueQueue* paramQueue = paramChanges->getParameterData(i);
+			if (paramQueue)
+			{
+				int32 numPoints = paramQueue->getPointCount();
+				int32 offsetSamples;
+				double value;
+				
+				if (paramQueue->getPoint(numPoints - 1,  offsetSamples, value) == kResultTrue)
+				{
+					int idx = paramQueue->getParameterId();
+					
+					switch (idx)
+					{
+						case kBypassParam:
+						{
+							bool bypassed = (value > 0.5);
+							
+							if (bypassed != mIsBypassed)
+							{
+								mIsBypassed = bypassed;
+							}
+							
+							break;
+						}
+						case kPresetParam:
+							RestorePreset(FromNormalizedParam(value, 0, NPresets(), 1.));
+							break;
+						default:
+							if (idx >= 0 && idx < NParams())
+							{
+								GetParam(idx)->SetNormalized((double)value);
+								if (GetGUI()) GetGUI()->SetParameterFromPlug(idx, (double)value, true);
+								OnParamChange(idx, kAutomation);
 							}
 							// if idx is > than NParams() we have MIDI CC
 							else if (idx >= NParams() && DoesMIDI())
@@ -419,48 +419,48 @@ tresult PLUGIN_API IPlugVST3::process(ProcessData& data)
 								msg.MakeControlChangeMsg((IMidiMsg::EControlChangeMsg)midiCCNum, value, 0);
 								ProcessMidiMsg(&msg);
 							}
-              break;
-          }
-
-        }
-      }
-    }
-  }
-
-  if(DoesMIDI())
-  {
-    //process events.. only midi note on and note off?
-    IEventList* eventList = data.inputEvents;
-    if (eventList)
-    {
-      int32 numEvent = eventList->getEventCount();
-      for (int32 i=0; i<numEvent; i++)
-      {
-        Event event;
-        if (eventList->getEvent(i, event) == kResultOk)
-        {
-          IMidiMsg msg;
-          switch (event.type)
-          {
-            case Event::kNoteOnEvent:
-            {
-              msg.MakeNoteOnMsg(event.noteOn.pitch, event.noteOn.velocity * 127, event.sampleOffset, event.noteOn.channel);
-              ProcessMidiMsg(&msg);
-              break;
-            }
-
-            case Event::kNoteOffEvent:
-            {
-              msg.MakeNoteOffMsg(event.noteOff.pitch, event.sampleOffset, event.noteOff.channel);
-              ProcessMidiMsg(&msg);
-              break;
-            }
-          }
-        }
-      }
-    }
-  }
-
+							break;
+					}
+					
+				}
+			}
+		}
+	}
+	
+	if(DoesMIDI())
+	{
+		//process events.. only midi note on and note off?
+		IEventList* eventList = data.inputEvents;
+		if (eventList)
+		{
+			int32 numEvent = eventList->getEventCount();
+			for (int32 i=0; i<numEvent; i++)
+			{
+				Event event;
+				if (eventList->getEvent(i, event) == kResultOk)
+				{
+					IMidiMsg msg;
+					switch (event.type)
+					{
+						case Event::kNoteOnEvent:
+						{
+							msg.MakeNoteOnMsg(event.noteOn.pitch, event.noteOn.velocity * 127, event.sampleOffset, event.noteOn.channel);
+							ProcessMidiMsg(&msg);
+							break;
+						}
+							
+						case Event::kNoteOffEvent:
+						{
+							msg.MakeNoteOffMsg(event.noteOff.pitch, event.sampleOffset, event.noteOff.channel);
+							ProcessMidiMsg(&msg);
+							break;
+						}
+					}
+				}
+			}
+		}
+	}
+	
 #pragma mark process single precision
 
   if (processSetup.symbolicSampleSize == kSample32)

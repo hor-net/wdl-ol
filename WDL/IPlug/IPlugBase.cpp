@@ -539,14 +539,14 @@ void IPlugBase::SetParameterFromGUI(int idx, double normalizedValue)
   WDL_MutexLock lock(&mMutex);
   GetParam(idx)->SetNormalized(normalizedValue);
   InformHostOfParamChange(idx, normalizedValue);
-  OnParamChange(idx);
+  OnParamChange(idx, kGUI);
 }
 
-void IPlugBase::OnParamReset(bool fromSessionLoading = false)
+void IPlugBase::OnParamReset(ParamChangeSource source)
 {
   for (int i = 0; i < mParams.GetSize(); ++i)
   {
-    OnParamChange(i, fromSessionLoading);
+    OnParamChange(i, source);
   }
   //Reset();
 }
@@ -940,8 +940,7 @@ int IPlugBase::UnserializeParams(ByteChunk* pChunk, int startPos)
 #endif
 //#endif
   }
-	// set true the fromSessionLoading flagto inform the plug in that we are being restored from a save
-  OnParamReset(true);
+  OnParamReset(kPresetRecall);
   return pos;
 }
 

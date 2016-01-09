@@ -5,6 +5,8 @@
 
 #include "dfx/dfx-au-utilities.h"
 
+#define kAudioUnitRemovePropertyListenerWithUserDataSelect 0x0012
+
 typedef AudioStreamBasicDescription STREAM_DESC;
 
 // inline
@@ -95,7 +97,14 @@ OSStatus IPlugAU::IPlugAUEntry(ComponentParameters *params, void* pPlug)
     }
     case kAudioUnitInitializeSelect:
     {
-      return DoInitialize(_this);
+      if (!(_this->CheckLegalIO()))
+      {
+        return badComponentSelector;
+      }
+      _this->mActive = true;
+      _this->OnParamReset(kReset);
+      _this->OnActivate(true);
+      return noErr;
     }
     case kAudioUnitUninitializeSelect:
     {
@@ -1541,8 +1550,7 @@ OSStatus IPlugAU::SetParamProc(void* pPlug, AudioUnitParameterID paramID, AudioU
   {
     _this->GetGUI()->SetParameterFromPlug(paramID, value, false);
   }
-  _this->OnParamChange(paramID);
-#endif
+  _this->OnParamChange(paramID, kAutomation);
   return noErr;
 }
 

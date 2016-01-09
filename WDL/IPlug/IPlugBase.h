@@ -49,12 +49,11 @@ public:
 
   // Implementations should set a mutex lock like in the no-op!
   virtual void Reset() { TRACE; IMutexLock lock(this); }
-  virtual void OnParamChange(int paramIdx, bool fromSessionLoading = false) { IMutexLock lock(this); }
-	
-  // Default passthrough.  Inputs and outputs are [nChannel][nSample].
-  // Mutex is already locked.
-  virtual void ProcessDoubleReplacing(double** inputs, double** outputs, int nFrames);
-  virtual void ProcessSingleReplacing(float** inputs, float** outputs, int nFrames);
+  virtual void OnParamChange(int paramIdx, ParamChangeSource source = kUnknown) { IMutexLock lock(this); }
+
+	// Default passthrough.  Inputs and outputs are [nChannel][nSample].
+	// Mutex is already locked.
+	virtual void ProcessDoubleReplacing(double** inputs, double** outputs, int nFrames);
 
   // In case the audio processing thread needs to do anything when the GUI opens
   // (like for example, set some state dependent initial values for controls).
@@ -235,8 +234,7 @@ protected:
   // ----------------------------------------
   // Internal IPlug stuff (but API classes need to get at it).
 
-	void OnParamReset();
-  void OnParamReset(bool fromSessionLoading);  // Calls OnParamChange(each param) + Reset().
+  void OnParamReset(ParamChangeSource source);  // Calls OnParamChange(each param) + Reset().
 
   void PruneUninitializedPresets();
 
