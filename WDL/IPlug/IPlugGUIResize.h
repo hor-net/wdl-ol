@@ -79,11 +79,9 @@ Normal View:               Normal View - Scaled 2X:
 */
 
 #include <vector>
-#include <cmath> 
+#include <math.h> 
 #include "IGraphics.h"
 #include "IControl.h"
-#include "IPlugConfigFile.h"
-#include "IPlugFileSystem.h"
 
 using namespace std;
 
@@ -154,17 +152,39 @@ public:
 	void ShowControl(int index);
 	void ShowControl(IControl* pControl);
 
+	void MoveControlRelativeToWindowSize(int index, resizeFlag flag = drawAndTargetArea);
+	void MoveControlRelativeToWindowSize(IControl * moveControl, resizeFlag flag = drawAndTargetArea);
+	void MoveControlHorizontallyRelativeToWindowSize(int index, resizeFlag flag = drawAndTargetArea);
+	void MoveControlHorizontallyRelativeToWindowSize(IControl * moveControl, resizeFlag flag = drawAndTargetArea);
+	void MoveControlVerticallyRelativeToWindowSize(int index, resizeFlag flag = drawAndTargetArea);
+	void MoveControlVerticallyRelativeToWindowSize(IControl * moveControl, resizeFlag flag = drawAndTargetArea);
+
+	void MoveControlRelativeToControlDrawRect(int moveControlIndex, int relativeToControlIndex, double xRatio, double yRatio, resizeFlag flag = drawAndTargetArea);
+	void MoveControlRelativeToControlDrawRect(IControl * moveControl, IControl * relativeToControl, double xRatio, double yRatio, resizeFlag flag = drawAndTargetArea);
+	void MoveControlHorizontallyRelativeToControlDrawRect(int moveControlIndex, int relativeToControlIndex, double xRatio, resizeFlag flag = drawAndTargetArea);
+	void MoveControlHorizontallyRelativeToControlDrawRect(IControl * moveControl, IControl * relativeToControl, double xRatio, resizeFlag flag = drawAndTargetArea);
+	void MoveControlVerticallyRelativeToControlDrawRect(int moveControlIndex, int relativeToControlIndex, double yRatio, resizeFlag flag = drawAndTargetArea);
+	void MoveControlVerticallyRelativeToControlDrawRect(IControl * moveControl, IControl * relativeToControl, double yRatio, resizeFlag flag = drawAndTargetArea);
+
+	void MoveControlRelativeToNonScaledDRECT(int index, DRECT relativeTo, double xRatio, double yRatio, resizeFlag flag = drawAndTargetArea);
+	void MoveControlRelativeToNonScaledDRECT(IControl * pControl, DRECT relativeTo, double xRatio, double yRatio, resizeFlag flag = drawAndTargetArea);
+	void MoveControlHorizontallyRelativeToNonScaledDRECT(int index, DRECT relativeTo, double xRatio, resizeFlag flag = drawAndTargetArea);
+	void MoveControlHorizontallyRelativeToNonScaledDRECT(IControl * pControl, DRECT relativeTo, double xRatio, resizeFlag flag = drawAndTargetArea);
+	void MoveControlVerticallyRelativeToNonScaledDRECT(int index, DRECT relativeTo, double yRatio, resizeFlag flag = drawAndTargetArea);
+	void MoveControlVerticallyRelativeToNonScaledDRECT(IControl * pControl, DRECT relativeTo, double yRatio, resizeFlag flag = drawAndTargetArea);
+
 	void MoveControl(int index, double x, double y, resizeFlag flag = drawAndTargetArea);
 	void MoveControl(IControl * pControl, double x, double y, resizeFlag flag = drawAndTargetArea);
-	void MoveControlHorizontally(int index, double x, resizeFlag flag = drawAndTargetArea);
-	void MoveControlHorizontally(IControl * pControl, double x, resizeFlag flag = drawAndTargetArea);
-	void MoveControlVertically(int index, double y, resizeFlag flag = drawAndTargetArea);
-	void MoveControlVertically(IControl * pControl, double y, resizeFlag flag = drawAndTargetArea);
-
 	void RelativelyMoveControl(int index, double x, double y, resizeFlag flag = drawAndTargetArea);
 	void RelativelyMoveControl(IControl * pControl, double x, double y, resizeFlag flag = drawAndTargetArea);
+	void MoveAllContainingControls(int index, double x, double y, resizeFlag flag = drawAndTargetArea);
+	void MoveAllContainingControls(IControl * pControl, double x, double y, resizeFlag flag = drawAndTargetArea);
+	void MoveControlHorizontally(int index, double x, resizeFlag flag = drawAndTargetArea);
+	void MoveControlHorizontally(IControl * pControl, double x, resizeFlag flag = drawAndTargetArea);
 	void RelativelyMoveControlHorizontally(int index, double x, resizeFlag flag = drawAndTargetArea);
 	void RelativelyMoveControlHorizontally(IControl * pControl, double x, resizeFlag flag = drawAndTargetArea);
+	void MoveControlVertically(int index, double y, resizeFlag flag = drawAndTargetArea);
+	void MoveControlVertically(IControl * pControl, double y, resizeFlag flag = drawAndTargetArea);
 	void RelativelyMoveControlVertically(int index, double y, resizeFlag flag = drawAndTargetArea);
 	void RelativelyMoveControlVertically(IControl * pControl, double y, resizeFlag flag = drawAndTargetArea);
 
@@ -176,27 +196,6 @@ public:
 	void MoveControlRightEdge(IControl * pControl, double R, resizeFlag flag = drawAndTargetArea);
 	void MoveControlBottomEdge(int index, double B, resizeFlag flag = drawAndTargetArea);
 	void MoveControlBottomEdge(IControl * pControl, double B, resizeFlag flag = drawAndTargetArea);
-	
-	void MoveControlRelativeToNonScaledDRECT(int index, DRECT relativeTo, double xRatio, double yRatio, resizeFlag flag = drawAndTargetArea);
-	void MoveControlRelativeToNonScaledDRECT(IControl * pControl, DRECT relativeTo, double xRatio, double yRatio, resizeFlag flag = drawAndTargetArea);
-	void MoveControlHorizontallyRelativeToNonScaledDRECT(int index, DRECT relativeTo, double xRatio, resizeFlag flag = drawAndTargetArea);
-	void MoveControlHorizontallyRelativeToNonScaledDRECT(IControl * pControl, DRECT relativeTo, double xRatio, resizeFlag flag = drawAndTargetArea);
-	void MoveControlVerticallyRelativeToNonScaledDRECT(int index, DRECT relativeTo, double yRatio, resizeFlag flag = drawAndTargetArea);
-	void MoveControlVerticallyRelativeToNonScaledDRECT(IControl * pControl, DRECT relativeTo, double yRatio, resizeFlag flag = drawAndTargetArea);
-
-	void MoveControlRelativeToControlDrawRect(int moveControlIndex, int relativeToControlIndex, double xRatio, double yRatio, resizeFlag flag = drawAndTargetArea);
-	void MoveControlRelativeToControlDrawRect(IControl * moveControl, IControl * relativeToControl, double xRatio, double yRatio, resizeFlag flag = drawAndTargetArea);
-	void MoveControlHorizontallyRelativeToControlDrawRect(int moveControlIndex, int relativeToControlIndex, double xRatio, resizeFlag flag = drawAndTargetArea);
-	void MoveControlHorizontallyRelativeToControlDrawRect(IControl * moveControl, IControl * relativeToControl, double xRatio, resizeFlag flag = drawAndTargetArea);
-	void MoveControlVerticallyRelativeToControlDrawRect(int moveControlIndex, int relativeToControlIndex, double yRatio, resizeFlag flag = drawAndTargetArea);
-	void MoveControlVerticallyRelativeToControlDrawRect(IControl * moveControl, IControl * relativeToControl, double yRatio, resizeFlag flag = drawAndTargetArea);
-
-	void MoveControlRelativeToWindowSize(int index, resizeFlag flag = drawAndTargetArea);
-	void MoveControlRelativeToWindowSize(IControl * moveControl, resizeFlag flag = drawAndTargetArea);
-	void MoveControlHorizontallyRelativeToWindowSize(int index, resizeFlag flag = drawAndTargetArea);
-	void MoveControlHorizontallyRelativeToWindowSize(IControl * moveControl, resizeFlag flag = drawAndTargetArea);
-	void MoveControlVerticallyRelativeToWindowSize(int index, resizeFlag flag = drawAndTargetArea);
-	void MoveControlVerticallyRelativeToWindowSize(IControl * moveControl, resizeFlag flag = drawAndTargetArea);
 
 	void ResizeControlRelativeToWindowSize(int index, resizeFlag flag = drawAndTargetArea);
 	void ResizeControlRelativeToWindowSize(IControl * pControl, resizeFlag flag = drawAndTargetArea);
@@ -222,14 +221,23 @@ public:
 	int GetViewMode();
 	int GetViewModeSize();
 	bool CurrentlyFastResizing();
-	int GetHandleSize();
 	double GetWidnowSizeWidthRatio();
 	double GetWidnowSizeHeightRatio();
-	double GetWidnowWidthNormalized();
-	double GetWidnowHeightNormalized();
 	bool IsAttachedToIPlugBase();
-	DRECT GetOriginalDrawRECTForControl(IControl *pControl);
-	DRECT GetOriginalTargetRECTForControl(IControl *pControl);
+	DRECT GetOriginalDrawRECTForControl(IControl *pControl)
+	{
+		int index = FindLayoutPointerPosition(current_view_mode, pControl);
+		if (index < 0) return DRECT();
+		
+		return layout_container[current_view_mode].org_draw_area[index];
+	}
+	DRECT GetOriginalTargetRECTForControl(IControl *pControl)
+	{
+		int index = FindLayoutPointerPosition(current_view_mode, pControl);
+		if (index < 0) return DRECT();
+
+		return layout_container[current_view_mode].org_target_area[index];
+	}
 	// ------------------------------------------------------------------------------------------------------------------------------------------------------
 		
 	
@@ -265,6 +273,7 @@ private:
 	IRECT DRECT_to_IRECT(DRECT * dRECT);
 	IRECT RescaleToIRECT(DRECT * old_IRECT, double width_ratio, double height_ratio);
 	DRECT RescaleToDRECT(DRECT * old_IRECT, double width_ratio, double height_ratio);
+	void GetContainingControls(vector<IControl*> *containingControls, IControl* pControl);
 	DRECT* GetLayoutContainerDrawRECT(int viewMode, IControl* pControl);
 	DRECT* GetLayoutContainerTargetRECT(int viewMode, IControl* pControl);
 	int* GetLayoutContainerIsHidden(int viewMode, IControl* pControl);
@@ -272,7 +281,7 @@ private:
 	int FindLayoutPointerPosition(int viewMode, IControl* pControl);
 	void RearrangeLayers();
 
-	void SetIntToFile(const char *name, unsigned int x);
+	void SetIntToFile(const char *name, int x);
 	int GetIntFromFile(const char *name);
 	void SetDoubleToFile(const char *name, double x);
 	double GetDoubleFromFile(const char *name);
@@ -292,11 +301,6 @@ private:
 	void OnMouseUp(int x, int y, IMouseMod* pMod);
 	// ---------------------------------------------------------------------------------------------------------------------------------------------
 
-	IPlugConfigFile configFile;
-	IPlugFileSystem fileSystem;
-
-    int mouse_down_x = 0;
-    int mouse_down_y = 0;
 
 	int current_view_mode;
 
@@ -341,6 +345,7 @@ private:
 	double* backup_parameters;
 	IRECT gui_resize_area;
 	WDL_String settings_ini_path;
+	char buf[128]; // temp buffer for writing integers to profile strings
 	resizeOneSide one_side_flag;
 	WDL_PtrList<IParam> guiResizeParameters;
 
