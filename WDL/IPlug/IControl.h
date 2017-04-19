@@ -508,6 +508,7 @@ public:
 		
 		int captionHeight = pText->mSize + 4;
 		int captionTop = mImgRECT.T + (mImgRECT.H()/2) - (captionHeight/2)+2;
+		captionTop = captionTop + labelOffset;
 		switch (labelPosition) {
 			case kTxtPosBelow:
 				mTextRECT = IRECT(mImgRECT.L, mImgRECT.B + 4 + labelOffset, mImgRECT.L+mImgRECT.W(), mImgRECT.T+mImgRECT.H()+4+captionHeight + labelOffset);

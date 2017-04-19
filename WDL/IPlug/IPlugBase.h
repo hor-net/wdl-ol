@@ -225,8 +225,8 @@ protected:
   bool DoesStateChunks() { return mStateChunks; }
 
   // Will append if the chunk is already started
-  bool SerializeParams(ByteChunk* pChunk);
-  int UnserializeParams(ByteChunk* pChunk, int startPos); // Returns the new chunk position (endPos)
+  virtual bool SerializeParams(ByteChunk* pChunk);
+  virtual int UnserializeParams(ByteChunk* pChunk, int startPos); // Returns the new chunk position (endPos)
 
   #ifndef OS_IOS
   virtual void RedrawParamControls();  // Called after restoring state.

@@ -35,7 +35,8 @@ void IParam::InitEnum(const char* name, int defaultVal, int nEnums, const char* 
 {
   if (mType == kTypeNone) mType = kTypeEnum;
   
-  InitInt(name, defaultVal, 0, nEnums - 1, label, group);
+  //InitInt(name, defaultVal, 0, nEnums - 1, label, group);
+	InitDouble(name, defaultVal, 0, nEnums - 1, 0.1, label, group);
 }
 
 void IParam::InitInt(const char* name, int defaultVal, int minVal, int maxVal, const char* label, const char* group)

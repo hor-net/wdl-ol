@@ -128,6 +128,7 @@
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
+      <PreprocessorDefinitions>WIN32;_LIB;PNG_USE_PNGVCRD;PNG_LIBPNG_SPECIALBUILD;__MMX__;PNG_HAVE_MMX_COMBINE_ROW;PNG_HAVE_MMX_READ_INTERLACE;PNG_HAVE_MMX_READ_FILTER_ROW;_CRT_SECURE_NO_WARNINGS;LICE_TEXT_NONATIVE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
