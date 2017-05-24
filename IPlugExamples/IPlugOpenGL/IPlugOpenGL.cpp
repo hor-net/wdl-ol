@@ -1,6 +1,7 @@
 #include "IPlugOpenGL.h"
 #include "IPlug_include_in_plug_src.h"
 #include "IControl.h"
+#include "IOpenGLControl.h"
 #include "resource.h"
 
 const int kNumPrograms = 1;
@@ -30,11 +31,11 @@ IPlugOpenGL::IPlugOpenGL(IPlugInstanceInfo instanceInfo)
   GetParam(kGain)->InitDouble("Gain", 50., 0., 100.0, 0.01, "%");
   GetParam(kGain)->SetShape(2.);
 
-  IGraphics* pGraphics = MakeGraphics(this, kWidth, kHeight, 30);
+  IGraphics* pGraphics = MakeGraphics(this, kWidth, kHeight, 60);
   pGraphics->AttachPanelBackground(&COLOR_BLACK);
-  #ifdef OS_OSX
-  pGraphics->AttachControl(new IOpenGLTestControl(this, IRECT(10, 10, GUI_WIDTH-10, GUI_HEIGHT-10)));
-  #endif
+
+  pGraphics->AttachControl(new IOpenGLControl(this, IRECT(10, 10, GUI_WIDTH-10, GUI_HEIGHT-10)));
+  
   AttachGraphics(pGraphics);
   //MakePreset("preset 1", ... );
   MakeDefaultPreset((char *) "-", kNumPrograms);
