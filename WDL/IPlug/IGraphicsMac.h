@@ -6,10 +6,11 @@
 #endif
 
 // carbon support uses quickdraw methods that have been removed in SDKs > 10.6
-#if !defined(IPLUG_NO_CARBON_SUPPORT) && __MAC_OS_X_VERSION_MAX_ALLOWED > 1060
-  #warning Carbon GUIs work best with the 10.6 sdk
+#if __MAC_OS_X_VERSION_MAX_ALLOWED > 1060
+  //#warning Carbon GUIs work best with the 10.6 sdk or lower
 #endif
 
+#include "IControl.h"
 #include "IGraphics.h"
 #include "../swell/swell.h"
 
@@ -96,12 +97,13 @@ public:
   void HostPath(WDL_String* pPath);
   void PluginPath(WDL_String* pPath);
   void DesktopPath(WDL_String* pPath);
+  void DocumentsPath(WDL_String * pPath);
 //  void VST3PresetsPath(WDL_String* pPath, bool isSystem = true);
   void AppSupportPath(WDL_String* pPath, bool isSystem = false);
   void SandboxSafeAppSupportPath(WDL_String* pPath);
 
   void PromptForFile(WDL_String* pFilename, EFileAction action = kFileOpen, WDL_String* pDir = 0, char* extensions = "");   // extensions = "txt wav" for example.
-  virtual bool PromptForColor(IColor* pColor, char* prompt = "");
+  bool PromptForColor(IColor* pColor, char* prompt = "");
 
   IPopupMenu* CreateIPopupMenu(IPopupMenu* pMenu, IRECT* pTextRect);
   void CreateTextEntry(IControl* pControl, IText* pText, IRECT* pTextRect, const char* pString, IParam* pParam );
@@ -117,10 +119,7 @@ public:
 
 protected:
   virtual LICE_IBitmap* OSLoadBitmap(int ID, const char* name);
-#ifdef IPLUG_RETINA_SUPPORT
-  void CheckIfRetina();
-#endif
-	
+  
 private:
 #ifndef IPLUG_NO_CARBON_SUPPORT
   IGraphicsCarbon* mGraphicsCarbon;
@@ -140,6 +139,7 @@ private:
   
 public: //TODO: make this private
   void* mHostNSWindow;
+  void* mChildNSWindow;
 };
 
 inline CFStringRef MakeCFString(const char* cStr)

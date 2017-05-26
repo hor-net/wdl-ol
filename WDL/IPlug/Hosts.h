@@ -4,6 +4,8 @@
 #include <stdlib.h>
 #include <string.h>
 
+// Check this: https://github.com/julianstorer/JUCE/blob/master/modules/juce_audio_plugin_client/utility/juce_PluginHostType.h
+
 enum EAPI
 {
   kAPIVST2 = 0,
@@ -45,7 +47,10 @@ enum EHost
   kHostAudioMulch,
   kHostStudioOne,
   kHostVST3TestHost,
-  kHostArdour
+  kHostArdour,
+  kHostRenoise,
+  kHostOpenMPT,
+  kHostWaveLab
 
   // These hosts don't report the host name:
   // EnergyXT2

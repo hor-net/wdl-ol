@@ -250,7 +250,7 @@ bool SetMenuItemModifier(HMENU hMenu, int idx, int flag, int code, unsigned int 
     
     if (code>='A' && code<='Z') suppressShift=true;
   }
-  else if (code >= VK_F1 && code <= VK_F12)
+  else if (code >= VK_F1 && code <= VK_F24)
   {
     arrowKey = NSF1FunctionKey + code - VK_F1;
   }
@@ -788,6 +788,7 @@ void SWELL_SetMenuDestination(HMENU menu, HWND hwnd)
 
 int TrackPopupMenu(HMENU hMenu, int flags, int xpos, int ypos, int resvd, HWND hwnd, const RECT *r)
 {
+  ReleaseCapture(); // match win32 -- TrackPopupMenu() ends any captures
   if (hMenu)
   {
     NSMenu *m=(NSMenu *)hMenu;

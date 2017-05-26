@@ -9,6 +9,71 @@
 #include "pluginterfaces/vst/ivstparameterchanges.h"
 #include "pluginterfaces/vst/ivstevents.h"
 
+using namespace Steinberg;
+using namespace Vst;
+
+#include "IParam.h"
+
+class IPlugParameter : public Parameter
+{
+public:
+  IPlugParameter (IParam* pParam, ParamID tag, UnitID unitID)
+  : mIPlugParam(pParam)
+  {
+    UString (info.title, str16BufferSize (String128)).assign (pParam->GetNameForHost());
+    UString (info.units, str16BufferSize (String128)).assign (pParam->GetLabelForHost());
+    
+    precision = pParam->GetPrecision();
+    
+    if (pParam->Type() != IParam::kTypeDouble)
+      info.stepCount = pParam->GetRange();
+    else
+      info.stepCount = 0; // continuous
+    
+    int32 flags = 0;
+
+    if (pParam->GetCanAutomate())
+    {
+      flags |= ParameterInfo::kCanAutomate;
+    }
+    
+    info.defaultNormalizedValue = valueNormalized = pParam->GetDefaultNormalized();
+    info.flags = flags;
+    info.id = tag;
+    info.unitId = unitID;
+  }
+  
+  virtual void toString (ParamValue valueNormalized, String128 string) const
+  {
+    char disp[MAX_PARAM_DISPLAY_LEN];
+    mIPlugParam->GetDisplayForHost(valueNormalized, true, disp);
+    Steinberg::UString(string, 128).fromAscii(disp);
+  }
+  
+  virtual bool fromString (const TChar* string, ParamValue& valueNormalized) const
+  {
+    String str ((TChar*)string);
+    valueNormalized = mIPlugParam->GetNormalized(atof(str.text8()));
+    
+    return true;
+  }
+  
+  virtual Steinberg::Vst::ParamValue toPlain (ParamValue valueNormalized) const
+  {
+    return mIPlugParam->GetNonNormalized(valueNormalized);
+  }
+  
+  virtual Steinberg::Vst::ParamValue toNormalized (ParamValue plainValue) const
+  {
+    return mIPlugParam->GetNormalized(valueNormalized);
+  }
+  
+  OBJ_METHODS (IPlugParameter, Parameter)
+  
+protected:
+  IParam* mIPlugParam;
+};
+
 IPlugVST3::IPlugVST3(IPlugInstanceInfo instanceInfo,
                      int nParams,
                      const char* channelIOStr,
@@ -163,7 +228,6 @@ tresult PLUGIN_API IPlugVST3::initialize (FUnknown* context)
     {
       IParam *p = GetParam(i);
 
-      int32 flags = 0;
       UnitID unitID = kRootUnitId;
       
       const char* paramGroupName = p->GetParamGroupForHost();
@@ -184,56 +248,9 @@ tresult PLUGIN_API IPlugVST3::initialize (FUnknown* context)
           unitID = mParamGroups.GetSize();
         }
       }
-
-      if (p->GetCanAutomate())
-      {
-        flags |= ParameterInfo::kCanAutomate;
-      }
-
-      switch (p->Type())
-      {
-        case IParam::kTypeDouble:
-        case IParam::kTypeInt:
-        {
-          Parameter* param = new RangeParameter( STR16(p->GetNameForHost()),
-                                                 i,
-                                                 STR16(p->GetLabelForHost()),
-                                                 p->GetMin(),
-                                                 p->GetMax(),
-                                                 p->GetDefault(),
-                                                 0, // continuous
-                                                 flags,
-                                                 unitID);
-
-          param->setPrecision (p->GetPrecision());
-          parameters.addParameter(param);
-
-          break;
-        }
-        case IParam::kTypeEnum:
-        case IParam::kTypeBool:
-        {
-          StringListParameter* param = new StringListParameter (STR16(p->GetNameForHost()),
-                                                                i,
-                                                                STR16(p->GetLabelForHost()),
-                                                                flags | ParameterInfo::kIsList,
-                                                                unitID);
-
-          int nDisplayTexts = p->GetNDisplayTexts();
-
-          assert(nDisplayTexts);
-
-          for (int j=0; j<nDisplayTexts; j++)
-          {
-            param->appendString(STR16(p->GetDisplayText(j)));
-          }
-
-          parameters.addParameter(param);
-          break;
-        }
-        default:
-          break;
-      }
+      
+      Parameter* param = new IPlugParameter(p, i, unitID);
+      parameters.addParameter(param);
     }
 		
 		// if does midi is set creates 128 fake parameters to be used to map control change since
@@ -680,10 +697,16 @@ tresult PLUGIN_API IPlugVST3::setEditorState(IBStream* state)
   WDL_MutexLock lock(&mMutex);
 
   ByteChunk chunk;
-  SerializeState(&chunk); // to get the size
 
-  if (chunk.Size() > 0)
+  // Get the chunk size
+  int chunkSize;
+  state->read(&chunkSize, sizeof(int));
+
+  if (chunkSize > 0)
   {
+	// Resize IPlug ByteChunk to fit all new information
+	chunk.Resize(chunkSize);
+
     state->read(chunk.GetBytes(), chunk.Size());
     UnserializeState(&chunk, 0);
     
@@ -710,6 +733,16 @@ tresult PLUGIN_API IPlugVST3::getEditorState(IBStream* state)
 
   ByteChunk chunk;
 
+  int chunkSize = 0;
+  int64 stateStartPosition, stateEndPosition;
+  
+  // Get the position at the start
+  state->tell(&stateStartPosition);
+
+  // Leave room to write chunk size at the beginning. 
+  // Write dummy chunk size that will be overwritten at the end.
+  state->write(&chunkSize, sizeof(int));
+
   if (SerializeState(&chunk))
   {
     state->write(chunk.GetBytes(), chunk.Size());
@@ -718,6 +751,19 @@ tresult PLUGIN_API IPlugVST3::getEditorState(IBStream* state)
   {
     return kResultFalse;
   }  
+
+  // Get the position at the end
+  state->tell(&stateEndPosition);
+
+  // Move to beginning to write the chunk size
+  state->seek(stateStartPosition, IBStream::IStreamSeekMode::kIBSeekSet);
+
+  // Write chunk size at the beginning
+  chunkSize = chunk.Size();
+  state->write(&chunkSize, sizeof(int));
+
+  // Return position to the end
+  state->seek(stateEndPosition, IBStream::IStreamSeekMode::kIBSeekSet);
   
   int32 toSaveBypass = mIsBypassed ? 1 : 0;
   state->write(&toSaveBypass, sizeof (int32));  
@@ -992,10 +1038,16 @@ int IPlugVST3::GetSamplePos()
 
 void IPlugVST3::ResizeGraphics(int w, int h)
 {
-  if (GetGUI())
-  {
-    viewsArray.at(0)->resize(w, h);
-  }
+    if (GetGUI())
+    {
+        viewsArray.at(0)->resize(w, h);
+        
+        OnWindowResize();
+        
+#ifdef USING_YCAIRO
+        ResizeCairoSurface();
+#endif
+    }
 }
 
 void IPlugVST3::SetLatency(int latency)
@@ -1102,9 +1154,9 @@ tresult PLUGIN_API IPlugVST3View::onSize(ViewRect* newSize)
   {
     rect = *newSize;
 
+    // TODO: Check what is this doing
     if (mExpectingNewSize)
     {
-      mPlug->OnWindowResize();
       mExpectingNewSize = false;
     }
   }
@@ -1142,6 +1194,7 @@ tresult PLUGIN_API IPlugVST3View::attached (void* parent, FIDString type)
       mPlug->GetGUI()->OpenWindow(parent, 0);
     #endif
     mPlug->OnGUIOpen();
+	mPlug->ResizeAtGUIOpen(mPlug->GetGUI());
 
     return kResultTrue;
   }

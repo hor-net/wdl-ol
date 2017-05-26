@@ -4,7 +4,6 @@
 #include "Containers.h"
 #include "IPlugOSDetect.h"
 
-#ifndef OS_IOS
 #include "../swell/swell.h"
 #include "../lice/lice_text.h"
 
@@ -43,11 +42,23 @@ struct IBitmap
 struct IColor
 {
   int A, R, G, B;
-  IColor(int a = 255, int r = 0, int g = 0, int b = 0) : A(a), R(r), G(g), B(b) {}
+  IColor() : A(255), R(0), G(0), B(0) {}
+  IColor(int hexRGB, int alpha = 255); // Hex value should start with 0x
+  IColor(double H, double S, double V)  { SetHSV(H, S, V); } // H = 0-360, S = 0-100, V = 0-100
+  IColor(int a, int r, int g, int b) : A(a), R(r), G(g), B(b) {}
   bool operator==(const IColor& rhs) { return (rhs.A == A && rhs.R == R && rhs.G == G && rhs.B == B); }
   bool operator!=(const IColor& rhs) { return !operator==(rhs); }
   bool Empty() const { return A == 0 && R == 0 && G == 0 && B == 0; }
   void Clamp() { A = IPMIN(A, 255); R = IPMIN(R, 255); G = IPMIN(G, 255); B = IPMIN(B, 255); }
+  double A_Norm() { return double(A) / 255.0; } // Get normalized value 0-1
+  double R_Norm() { return double(R) / 255.0; } // Get normalized value 0-1
+  double G_Norm() { return double(G) / 255.0; } // Get normalized value 0-1
+  double B_Norm() { return double(B) / 255.0; } // Get normalized value 0-1
+  void SetHSV(double H, double S, double V); // H = 0-360, S = 0-100, V = 0-100
+  void GetHSV(double *getH, double *getS, double *getV); // H = 0-360, S = 0-100, V = 0-100
+  void SetHue(double hue); // Hue = 0-360
+  void SetSaturation(double saturation); // Saturation = 0-100
+  void SetBrightness(double brightness); // Value/Brightness = 0-100
 };
 
 const IColor COLOR_TRANSPARENT(0, 0, 0, 0);
@@ -140,20 +151,31 @@ struct IText
 };
 
 // these are macros to shorten the instantiation of IControls
-// for a paramater ID MyParam, define constants named MyParam_X, MyParam_Y, MyParam_W, MyParam_H to specify the Control's IRect
+// for a parameter ID MyParam, define constants named MyParam_X, MyParam_Y, MyParam_W, MyParam_H to specify the Control's IRect
 // then when instantiating a Control you can just call MakeIRect(MyParam) to specify the IRect
 #define MakeIRect(a) IRECT(a##_X, a##_Y, a##_X + a##_W, a##_Y + a##_H)
 #define MakeIRectHOffset(a, xoffs) IRECT(a##_X + xoffs, a##_Y, a##_X + a##_W + xoffs, a##_Y + a##_H)
 #define MakeIRectVOffset(a, yoffs) IRECT(a##_X, a##_Y + yoffs, a##_X + a##_W, a##_Y + a##_H + yoffs)
 #define MakeIRectHVOffset(a, xoffs, yoffs) IRECT(a##_X + xoffs, a##_Y + yoffs, a##_X + a##_W + xoffs, a##_Y + a##_H + yoffs)
 
+struct DRECT;
 struct IRECT
 {
   int L, T, R, B;
 
   IRECT() { L = T = R = B = 0; }
   IRECT(int l, int t, int r, int b) : L(l), R(r), T(t), B(b) {}
-  IRECT(int x, int y, IBitmap* pBitmap) : L(x), T(y), R(x + pBitmap->W), B(y + pBitmap->H / pBitmap->N) {}
+  IRECT(int x, int y, IBitmap* pBitmap)
+  {
+	  if (pBitmap->mFramesAreHorizontal)
+	  {
+		  L = x, T = y, R = (x + pBitmap->W / pBitmap->N), B = (y + pBitmap->H);
+	  }
+	  else
+	  {
+		  L = x, T = y, R = (x + pBitmap->W), B = (y + pBitmap->H / pBitmap->N);
+	  }
+  }
 
   bool Empty() const
   {
@@ -165,6 +187,8 @@ struct IRECT
     L = T = R = B = 0;
   }
 
+  operator DRECT() const;
+
   bool operator==(const IRECT& rhs) const
   {
     return (L == rhs.L && T == rhs.T && R == rhs.R && B == rhs.B);
@@ -173,6 +197,85 @@ struct IRECT
   bool operator!=(const IRECT& rhs) const
   {
     return !(*this == rhs);
+  }
+
+  IRECT operator+(const IRECT& rhs) const
+  {
+	  return IRECT(L + rhs.L, T + rhs.T, R + rhs.R, B + rhs.B);
+  }
+
+  IRECT operator-(const IRECT& rhs) const
+  {
+	  return IRECT(L - rhs.L, T - rhs.T, R - rhs.R, B - rhs.B);
+  }
+
+  void operator+=(const IRECT& rhs)
+  {
+	  this->L += rhs.L;
+	  this->T += rhs.T;
+	  this->R += rhs.T;
+	  this->B += rhs.B;
+  }
+
+  void operator-=(const IRECT& rhs)
+  {
+	  this->L -= rhs.L;
+	  this->T -= rhs.T;
+	  this->R -= rhs.T;
+	  this->B -= rhs.B;
+  }
+
+  void operator*=(const IRECT& rhs)
+  {
+	  this->L *= rhs.L;
+	  this->T *= rhs.T;
+	  this->R *= rhs.T;
+	  this->B *= rhs.B;
+  }
+
+  void operator/=(const IRECT& rhs)
+  {
+#ifdef _DEBUG
+	  if (rhs.L != 0) this->L /= rhs.L;
+	  else  assert(0 && "Division by 0 with IRECT occurred!");
+	  if (rhs.T != 0) this->T /= rhs.T;
+	  else  assert(0 && "Division by 0 with IRECT occurred!");
+	  if (rhs.R != 0) this->R /= rhs.T;
+	  else assert(0 && "Division by 0 with IRECT occurred!");
+	  if (rhs.B != 0) this->B /= rhs.B;
+	  else assert(0 && "Division by 0 with IRECT occurred!");
+
+#else
+	  this->L /= rhs.L;
+	  this->T /= rhs.T;
+	  this->R /= rhs.T;
+	  this->B /= rhs.B;
+#endif
+  }
+
+  IRECT operator*(const IRECT& rhs) const
+  {
+	  return IRECT(L * rhs.L, T * rhs.T, R * rhs.R, B * rhs.B);
+  }
+
+  IRECT operator/(const IRECT& rhs) const
+  {
+#ifdef _DEBUG
+	  IRECT output;
+
+	  if (rhs.L != 0) output.L = L / rhs.L;
+	  else  assert(0 && "Division by 0 with IRECT occurred!");
+	  if (rhs.T != 0) output.T = T / rhs.T;
+	  else  assert(0 && "Division by 0 with IRECT occurred!");
+	  if (rhs.R != 0) output.R = R / rhs.R;
+	  else  assert(0 && "Division by 0 with IRECT occurred!");
+	  if (rhs.B != 0) output.B = B / rhs.B;
+	  else  assert(0 && "Division by 0 with IRECT occurred!");
+
+	  return output;
+#else
+	  return IRECT(L / rhs.L, T / rhs.T, R / rhs.R, B / rhs.B);
+#endif
   }
 
   inline int W() const { return R - L; }
@@ -234,7 +337,7 @@ struct IRECT
 
   inline IRECT SubRectVertical(int numSlices, int sliceIdx)
   {
-    int heightOfSubRect = (H() / numSlices);
+    int heightOfSubRect = int(float(H()) / numSlices);
     int t = heightOfSubRect * sliceIdx;
 
     return IRECT(L, T + t, R, T + t + heightOfSubRect);
@@ -242,7 +345,7 @@ struct IRECT
 
   inline IRECT SubRectHorizontal(int numSlices, int sliceIdx)
   {
-    int widthOfSubRect = (W() / numSlices);
+    int widthOfSubRect = int(float(W()) / numSlices);
     int l = widthOfSubRect * sliceIdx;
 
     return IRECT(L + l, T, L + l + widthOfSubRect, B);
@@ -293,14 +396,124 @@ struct IRECT
   }
 };
 
+// Similar to IRECT but it uses doubles instead
+struct DRECT
+{
+	double L, T, R, B;
+
+	DRECT() { L = T = R = B = 0.0; }
+	DRECT(double l, double t, double r, double b) : L(l), R(r), T(t), B(b) {}
+
+	bool Empty() const
+	{
+		return (L == 0 && T == 0 && R == 0 && B == 0);
+	}
+
+	void Clear()
+	{
+		L = T = R = B = 0;
+	}
+
+	operator IRECT();
+
+	DRECT operator+(const DRECT& rhs) const
+	{
+		return DRECT(L + rhs.L, T + rhs.T, R + rhs.R, B + rhs.B);
+	}
+
+	DRECT operator-(const DRECT& rhs) const
+	{
+		return DRECT(L - rhs.L, T - rhs.T, R - rhs.R, B - rhs.B);
+	}
+
+	void operator+=(const DRECT& rhs)
+	{
+		this->L += rhs.L;
+		this->T += rhs.T;
+		this->R += rhs.T;
+		this->B += rhs.B;
+	}
+
+	void operator-=(const DRECT& rhs)
+	{
+		this->L -= rhs.L;
+		this->T -= rhs.T;
+		this->R -= rhs.T;
+		this->B -= rhs.B;
+	}
+
+	void operator*=(const DRECT& rhs)
+	{
+		this->L *= rhs.L;
+		this->T *= rhs.T;
+		this->R *= rhs.T;
+		this->B *= rhs.B;
+	}
+
+	void operator/=(const DRECT& rhs)
+	{
+#ifdef _DEBUG
+		if (rhs.L != 0) this->L /= rhs.L;
+		else  assert(0 && "Division by 0 with IRECT occurred!");
+		if (rhs.T != 0) this->T /= rhs.T;
+		else  assert(0 && "Division by 0 with IRECT occurred!");
+		if (rhs.R != 0) this->R /= rhs.T;
+		else assert(0 && "Division by 0 with IRECT occurred!");
+		if (rhs.B != 0) this->B /= rhs.B;
+		else assert(0 && "Division by 0 with IRECT occurred!");
+
+#else
+		this->L /= rhs.L;
+		this->T /= rhs.T;
+		this->R /= rhs.T;
+		this->B /= rhs.B;
+#endif
+	}
+
+	DRECT operator*(const DRECT& rhs) const
+	{
+		return DRECT(L * rhs.L, T * rhs.T, R * rhs.R, B * rhs.B);
+	}
+
+	DRECT operator/(const DRECT& rhs) const
+	{
+#ifdef _DEBUG
+		DRECT output;
+
+		if (rhs.L != 0) output.L = L / rhs.L;
+		else  assert(0 && "Division by 0 with IRECT occurred!");
+		if (rhs.T != 0) output.T = T / rhs.T;
+		else  assert(0 && "Division by 0 with IRECT occurred!");
+		if (rhs.R != 0) output.R = R / rhs.R;
+		else  assert(0 && "Division by 0 with IRECT occurred!");
+		if (rhs.B != 0) output.B = B / rhs.B;
+		else  assert(0 && "Division by 0 with IRECT occurred!");
+
+		return output;
+#else
+		return DRECT(L / rhs.L, T / rhs.T, R / rhs.R, B / rhs.B);
+#endif
+	}
+
+	inline double W() const { return R - L; }
+	inline double H() const { return B - T; }
+	inline double MW() const { return 0.5 * (L + R); }
+	inline double MH() const { return 0.5 * (T + B); }
+
+	inline DRECT Union(DRECT* pRHS)
+	{
+		if (Empty()) { return *pRHS; }
+		if (pRHS->Empty()) { return *this; }
+		return DRECT(IPMIN(L, pRHS->L), IPMIN(T, pRHS->T), IPMAX(R, pRHS->R), IPMAX(B, pRHS->B));
+	}
+};
+
 struct IMouseMod
 {
   bool L, R, S, C, A;
   IMouseMod(bool l = false, bool r = false, bool s = false, bool c = false, bool a = false)
     : L(l), R(r), S(s), C(c), A(a) {}
 };
-
-#endif // !OS_IOS
 
 struct IMidiMsg
 {

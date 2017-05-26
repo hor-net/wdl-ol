@@ -549,6 +549,10 @@ void IPlugAAX::ResizeGraphics(int w, int h)
     pGraphics->GetViewContainer()->SetViewSize(oEffectViewSize);
 
     OnWindowResize();
+
+#ifdef USING_YCAIRO
+	ResizeCairoSurface();
+#endif
   }
 }
 

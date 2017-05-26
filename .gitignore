@@ -1,7 +1,3 @@
-.gitingore
-*.dep
-*.o
-*.a
 *.ipch
 *.lnk
 *.exe
@@ -22,9 +18,12 @@
 *.xcworkspace
 *xcuserdata*
 *.xcschememanagement.plist
-*.pbxtree
 build-*
 /IPlugExamples/*/*.vcxproj.user
+/.git
+/.sync
+YCAIRO/Cairo_Graphics/projects/*/Win32
+YCAIRO/Cairo_Graphics/projects/*/x64
 
 PCH/*
 VST3_SDK/*
@@ -35,6 +34,7 @@ ASIO_SDK/*
 CA_SDK/*
 Projects/*
 */*/gui/*
+.sync/*
 
 Icon?
 .DS_Stor*
@@ -47,13 +47,12 @@ Icon?
 IPlugExamples/build_errors.log
 
 /IPlugExamples/IPlugEEL/libEEL/build/
-<<<<<<< HEAD
-*/build/*
-=======
 
 /Ports/
 
 /ReaperExtensions/
 
 /IPlugExamples/duplicate.pyc
->>>>>>> 40a9501653e643457693d23541f3992903ac30b8
+WDL/lice/glew/include/GL/WGLEXT.H
+*.opendb
+IControl.cpp.orig

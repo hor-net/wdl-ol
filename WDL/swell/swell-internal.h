@@ -15,6 +15,7 @@ public:
   int m_tmp; // Cocoa uses this temporarily, generic uses it as a mask (1= selected)
 };
 
+struct HTREEITEM__;
 
 #ifdef SWELL_TARGET_OSX
 
@@ -53,6 +54,7 @@ public:
 #define SWELL_ListViewCell __SWELL_PREFIX_CLASSNAME(_listviewcell)
 #define SWELL_ODListViewCell __SWELL_PREFIX_CLASSNAME(_ODlistviewcell)
 #define SWELL_ODButtonCell __SWELL_PREFIX_CLASSNAME(_ODbuttoncell)
+#define SWELL_ImageButtonCell __SWELL_PREFIX_CLASSNAME(_imgbuttoncell)
 
 #define SWELL_FocusRectWnd __SWELL_PREFIX_CLASSNAME(_drawfocusrectwnd)
 
@@ -110,22 +112,6 @@ typedef struct WindowPropRec
   void *data;
   struct WindowPropRec *_next;
 } WindowPropRec;
-
-
-
-struct HTREEITEM__
-{
-  HTREEITEM__();
-  ~HTREEITEM__();
-  bool FindItem(HTREEITEM it, HTREEITEM__ **parOut, int *idxOut);
-  
-  SWELL_DataHold *m_dh;
-  
-  bool m_haschildren;
-  char *m_value;
-  WDL_PtrList<HTREEITEM__> m_children; // only used in tree mode
-  LPARAM m_param;
-};
 
 
 
@@ -197,9 +183,15 @@ struct HTREEITEM__
 -(void)setSwellStyle:(LONG)st;
 -(int)getSwellNotificationMode;
 -(void)setSwellNotificationMode:(int)lbMode;
--(int)columnAtPoint:(NSPoint)pt;
+-(NSInteger)columnAtPoint:(NSPoint)pt;
 -(int)getColumnPos:(int)idx; // get current position of column that was originally at idx
 -(int)getColumnIdx:(int)pos; // get original index of column that is currently at position
+@end
+
+@interface SWELL_ImageButtonCell : NSButtonCell
+{
+}
+- (NSRect)drawTitle:(NSAttributedString *)title withFrame:(NSRect)frame inView:(NSView *)controlView;
 @end
 
 @interface SWELL_ODButtonCell : NSButtonCell
@@ -264,7 +256,7 @@ struct HTREEITEM__
 @interface SWELL_hwndChild : NSView // <NSDraggingSource>
 {
 @public
-  BOOL m_enabled;
+  int m_enabled; // -1 if preventing focus
   DLGPROC m_dlgproc;
   WNDPROC m_wndproc;
   LONG_PTR m_userdata;
@@ -284,6 +276,7 @@ struct HTREEITEM__
   unsigned int m_create_windowflags;
   NSOpenGLContext *m_glctx;
   char m_isdirty; // &1=self needs redraw, &2=children may need redraw
+  char m_allow_nomiddleman;
   id m_lastTopLevelOwner; // save a copy of the owner, if any
   id m_access_cacheptrs[6];
 }
@@ -491,7 +484,6 @@ struct HGDIOBJ__
  
   // if using CoreText to draw text
   void *ct_FontRef;
-  char font_quality;
 };
 
 struct HDC__ {
@@ -551,8 +543,10 @@ struct HDC__ {
 
 
 
-
-#endif // __OBJC__
+#else
+  // compat when compiling targetting OSX but not in objectiveC mode
+  struct SWELL_DataHold;
+#endif // !__OBJC__
 
 // 10.4 sdk just uses "float"
 #if MAC_OS_X_VERSION_MAX_ALLOWED <= MAC_OS_X_VERSION_10_4
@@ -569,24 +563,50 @@ struct HDC__ {
 
 #include <gdk/gdk.h>
 #include <gdk/gdkkeysyms.h>
+#include <gdk/gdkx.h>
+
 
 #else
 // generic 
 
 #endif // end generic
 
+struct HTREEITEM__
+{
+  HTREEITEM__();
+  ~HTREEITEM__();
+  bool FindItem(HTREEITEM it, HTREEITEM__ **parOut, int *idxOut);
+  
+#ifdef SWELL_TARGET_OSX
+  SWELL_DataHold *m_dh;
+#else
+  int m_state; // TVIS_EXPANDED, for ex
+#endif
+  
+  bool m_haschildren;
+  char *m_value;
+  WDL_PtrList<HTREEITEM__> m_children; // only used in tree mode
+  LPARAM m_param;
+};
+
+
+
 #ifndef SWELL_TARGET_OSX 
+
+#include "../wdlstring.h"
 
 #ifdef SWELL_LICE_GDI
 #include "../lice/lice.h"
 #endif
 #include "../assocarray.h"
 
+#define SWELL_INTERNAL_MENUBAR_SIZE 12
+
 LRESULT SwellDialogDefaultWindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
 
 struct HWND__
 {
-  HWND__(HWND par, int wID=0, RECT *wndr=NULL, const char *label=NULL, bool visible=false, WNDPROC wndproc=NULL, DLGPROC dlgproc=NULL);
+  HWND__(HWND par, int wID=0, RECT *wndr=NULL, const char *label=NULL, bool visible=false, WNDPROC wndproc=NULL, DLGPROC dlgproc=NULL, HWND ownerWindow=NULL);
   ~HWND__(); // DO NOT USE!!! We would make this private but it breaks PtrList using it on gcc. 
 
   // using this API prevents the HWND from being valid -- it'll still get its resources destroyed via DestroyWindow() though.
@@ -603,12 +623,12 @@ struct HWND__
 #ifdef SWELL_TARGET_GDK
   GdkWindow *m_oswindow;
 #endif
-  char *m_title;
+  WDL_FastString m_title;
 
   HWND__ *m_children, *m_parent, *m_next, *m_prev;
-  HWND__ *m_owner, *m_owned;
+  HWND__ *m_owner, *m_owned_list, *m_owned_next, *m_owned_prev;
   RECT m_position;
-  int m_id;
+  UINT m_id;
   int m_style, m_exstyle;
   INT_PTR m_userdata;
   WNDPROC m_wndproc;
@@ -617,7 +637,7 @@ struct HWND__
   INT_PTR m_private_data; // used by internal controls
 
   bool m_visible;
-  bool m_hashaddestroy;
+  char m_hashaddestroy; // 1 in destroy, 2 full destroy
   bool m_enabled;
   bool m_wantfocus;
 
@@ -640,10 +660,11 @@ struct HWND__
 
 struct HMENU__
 {
-  HMENU__() { }
+  HMENU__() { sel_vis = -1; }
   ~HMENU__() { items.Empty(true,freeMenuItem); }
 
   WDL_PtrList<MENUITEMINFO> items;
+  int sel_vis; // for mouse/keyboard nav
 
   HMENU__ *Duplicate();
   static void freeMenuItem(void *p);
@@ -659,12 +680,11 @@ struct HGDIOBJ__
   int color;
   int wid;
 
+  float alpha;
+
   struct HGDIOBJ__ *_next;
   bool _infreelist;
-#ifdef SWELL_FREETYPE
-  void *fontface; // FT_Face
-#endif
-
+  void *typedata; // font: FT_Face, bitmap: LICE_IBitmap
 };
 
 
@@ -780,5 +800,48 @@ typedef struct
 
 
 bool IsRightClickEmulateEnabled();
+
+#ifdef SWELL_INTERNAL_HTREEITEM_IMPL
+
+HTREEITEM__::HTREEITEM__()
+{
+  m_param=0;
+  m_value=0;
+  m_haschildren=false;
+#ifdef SWELL_TARGET_OSX
+  m_dh = [[SWELL_DataHold alloc] initWithVal:this];
+#else
+  m_state=0;
+#endif
+}
+HTREEITEM__::~HTREEITEM__()
+{
+  free(m_value);
+  m_children.Empty(true);
+#ifdef SWELL_TARGET_OSX
+  [m_dh release];
+#endif
+}
+
+
+bool HTREEITEM__::FindItem(HTREEITEM it, HTREEITEM__ **parOut, int *idxOut)
+{
+  int a=m_children.Find((HTREEITEM__*)it);
+  if (a>=0)
+  {
+    if (parOut) *parOut=this;
+    if (idxOut) *idxOut=a;
+    return true;
+  }
+  int x;
+  const int n=m_children.GetSize();
+  for (x = 0; x < n; x ++)
+  {
+    if (m_children.Get(x)->FindItem(it,parOut,idxOut)) return true;
+  }
+  return false;
+}
+
+#endif
 
 #endif

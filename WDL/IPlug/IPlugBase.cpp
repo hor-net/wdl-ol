@@ -1,13 +1,16 @@
 #include "IPlugBase.h"
-#ifndef OS_IOS
 #include "IGraphics.h"
 #include "IControl.h"
-#endif
+#include "IPlugGUIResize.h"
 #include <math.h>
 #include <stdio.h>
 #include <time.h>
 #include "../wdlendian.h"
 #include "../base64encdec.h"
+
+#ifdef USING_YCAIRO
+#include "ycairo.h"
+#endif
 
 #ifndef VstInt32
   #ifdef WIN32
@@ -76,11 +79,11 @@ IPlugBase::IPlugBase(int nParams,
   , mLatency(latency)
   , mHost(kHostUninit)
   , mHostVersion(0)
-	, mDoesMIDI(plugDoesMidi)
   , mStateChunks(plugDoesChunks)
   , mGraphics(0)
   , mCurrentPresetIdx(0)
   , mIsInst(plugIsInst)
+  , mDoesMIDI(plugDoesMidi)
   , mAPI(plugAPI)
   , mIsBypassed(false)
   , mDelay(0)
@@ -152,9 +155,7 @@ IPlugBase::IPlugBase(int nParams,
 IPlugBase::~IPlugBase()
 {
   TRACE;
-  #ifndef OS_IOS
   DELETE_NULL(mGraphics);
-  #endif
   mParams.Empty(true);
   mPresets.Empty(true);
   mInChannels.Empty(true);
@@ -167,6 +168,10 @@ IPlugBase::~IPlugBase()
   {
     DELETE_NULL(mDelay);
   }
+
+#ifdef USING_YCAIRO
+  DELETE_NULL(ycairo);
+#endif
 }
 
 int IPlugBase::GetHostVersion(bool decimal)
@@ -224,12 +229,21 @@ void IPlugBase::SetHost(const char* host, int version)
   GetVersionStr(version, vStr);
   Trace(TRACELOC, "host_%sknown:%s:%s", (mHost == kHostUnknown ? "un" : ""), host, vStr);
 }
-#ifndef OS_IOS
+
 void IPlugBase::AttachGraphics(IGraphics* pGraphics)
 {
   if (pGraphics)
   {
-    WDL_MutexLock lock(&mMutex);
+	  WDL_MutexLock lock(&mMutex);
+
+	  pGraphics->PrepDraw();
+
+	  if (GetGUIResize())
+	  {
+		  // Here we are attaching our GUI resize control.
+		  pGraphics->AttachControl(GetGUIResize()->AttachGUIResize());
+	  }
+
     int i, n = mParams.GetSize();
     
     for (i = 0; i < n; ++i)
@@ -237,11 +251,37 @@ void IPlugBase::AttachGraphics(IGraphics* pGraphics)
       pGraphics->SetParameterFromPlug(i, GetParam(i)->GetNormalized(), true);
     }
     
-    pGraphics->PrepDraw();
     mGraphics = pGraphics;
+
+#ifdef USING_YCAIRO
+	ycairo->bind_to_lice(pGraphics);
+#endif
   }
 }
+
+#ifdef USING_YCAIRO
+void IPlugBase::ResizeCairoSurface()
+{
+	if (mGraphics && GetYCAIRO()->get_surface() && GetYCAIRO()->get_cr())
+	{
+		cairo_destroy(GetYCAIRO()->get_cr());
+		cairo_surface_destroy(GetYCAIRO()->get_surface());
+
+		GetYCAIRO()->bind_to_lice(mGraphics);
+	}
+}
 #endif
+
+void IPlugBase::ResizeAtGUIOpen(IGraphics * pGraphics)
+{
+	if (GetGUIResize())
+	{
+		GetGUIResize()->ResizeAtGUIOpen();
+	}
+}
+
+// ---------------------------------------------------------------------------------------------------------------------------
+
 
 // Decimal = VVVVRRMM, otherwise 0xVVVVRRMM.
 int IPlugBase::GetEffectVersion(bool decimal)
@@ -391,7 +431,6 @@ void IPlugBase::AttachInputBuffers(int idx, int n, float** ppData, int nFrames)
   int iEnd = IPMIN(idx + n, mInChannels.GetSize());
   for (int i = idx; i < iEnd; ++i)
   {
-		printf("attaching channel %d ...", i);
     InChannel* pInChannel = mInChannels.Get(i);
     if (pInChannel->mConnected)
     {
@@ -399,7 +438,6 @@ void IPlugBase::AttachInputBuffers(int idx, int n, float** ppData, int nFrames)
       CastCopy(pScratch, *(ppData++), nFrames);
       *(pInChannel->mSrc) = pScratch;
     }
-		printf("done\n");
   }
 }
 
@@ -532,7 +570,7 @@ void IPlugBase::SetLatency(int samples)
   }
 }
 
-// this is over-ridden for VST3 and AAX formats
+// this is over-ridden for AAX
 void IPlugBase::SetParameterFromGUI(int idx, double normalizedValue)
 {
   Trace(TRACELOC, "%d:%f", idx, normalizedValue);
@@ -542,18 +580,13 @@ void IPlugBase::SetParameterFromGUI(int idx, double normalizedValue)
   OnParamChange(idx);
 }
 
-void IPlugBase::OnParamReset(bool fromSessionLoading = false)
+void IPlugBase::OnParamReset()
 {
   for (int i = 0; i < mParams.GetSize(); ++i)
   {
-    OnParamChange(i, fromSessionLoading);
+    OnParamChange(i);
   }
   //Reset();
-}
-
-void IPlugBase::OnParamReset()
-{
-	OnParamReset(false);
 }
 
 // Default passthrough.
@@ -574,21 +607,6 @@ void IPlugBase::ProcessDoubleReplacing(double** inputs, double** outputs, int nF
   for (/* same j */; j < nOut; ++j)
   {
     memset(outputs[j], 0, nFrames * sizeof(double));
-  }
-}
-
-// Default passthrough ONLY USED BY IOS.
-void IPlugBase::ProcessSingleReplacing(float** inputs, float** outputs, int nFrames)
-{
-  // Mutex is already locked.
-  int i, nIn = mInChannels.GetSize(), nOut = mOutChannels.GetSize();
-  for (i = 0; i < nIn; ++i)
-  {
-    memcpy(outputs[i], inputs[i], nFrames * sizeof(float));
-  }
-  for (/* same i */; i < nOut; ++i)
-  {
-    memset(outputs[i], 0, nFrames * sizeof(float));
   }
 }
 
@@ -795,9 +813,7 @@ bool IPlugBase::RestorePreset(int idx)
     {
       mCurrentPresetIdx = idx;
       PresetsChangedByHost();
-      #ifndef OS_IOS
       RedrawParamControls();
-      #endif
     }
   }
   return restoredOK;
@@ -898,50 +914,72 @@ int IPlugBase::UnserializePresets(ByteChunk* pChunk, int startPos)
 
 bool IPlugBase::SerializeParams(ByteChunk* pChunk)
 {
-
   TRACE;
+
   WDL_MutexLock lock(&mMutex);
   bool savedOK = true;
   int i, n = mParams.GetSize();
+
+  // Save number of parameters. Do this so you can add parameters in the future versions without braking the plugin. 
+  // NOTE: Add new parameters at the end.
+  pChunk->Put(&n);
+
+  // Save parameters for GUIResize
+  if (GetGUIResize())
+  {
+	  for (i = 0; i < GetGUIResize()->GetGUIResizeParameterSize(); i++)
+	  {
+		  IParam* pParam = GetGUIResize()->GetGUIResizeParameter(i);
+		  double v = pParam->Value();
+		  pChunk->Put(&v);
+	  }
+  }
+
   for (i = 0; i < n && savedOK; ++i)
   {
     IParam* pParam = mParams.Get(i);
-	  double v;
-#ifndef IPLUG_SAVE_NORMALIZED_PARAMS
-	  v = pParam->Value();
-#else
-	  v = pParam->GetNormalized();
-#endif
-//#ifndef DEMO
+    Trace(TRACELOC, "%d %s %f", i, pParam->GetNameForHost(), pParam->Value());
+    double v = pParam->Value();
     savedOK &= (pChunk->Put(&v) > 0);
-//#endif
   }
-  return savedOK;
 
+  return savedOK;
 }
 
 int IPlugBase::UnserializeParams(ByteChunk* pChunk, int startPos)
 {
   TRACE;
- 
+
   WDL_MutexLock lock(&mMutex);
   int i, n = mParams.GetSize(), pos = startPos;
-  for (i = 0; i < n && pos >= 0; ++i)
+
+  // Use last saved parameter number.
+  pos = pChunk->Get(&n, pos);
+  n = IPMIN(n, mParams.GetSize());
+
+  // Save parameters for GUIResize
+  if (GetGUIResize())
+  {
+	  for (i = 0; i < GetGUIResize()->GetGUIResizeParameterSize(); i++)
+	  {
+		  IParam* pParam = GetGUIResize()->GetGUIResizeParameter(i);
+		  double v = 0.0;
+
+		  pos = pChunk->Get(&v, pos);
+		  pParam->Set(v);
+	  }
+  }
+
+  for (int i = 0; i < n && pos >= 0; ++i)
   {
     IParam* pParam = mParams.Get(i);
     double v = 0.0;
     Trace(TRACELOC, "%d %s %f", i, pParam->GetNameForHost(), pParam->Value());
     pos = pChunk->Get(&v, pos);
-//#ifndef DEMO
-#ifndef IPLUG_SAVE_NORMALIZED_PARAMS
     pParam->Set(v);
-#else
-	pParam->SetNormalized(v);
-#endif
-//#endif
   }
-	// set true the fromSessionLoading flagto inform the plug in that we are being restored from a save
-  OnParamReset(true);
+
+  OnParamReset();
   return pos;
 }
 
@@ -964,7 +1002,6 @@ bool IPlugBase::CompareState(const unsigned char* incomingState, int startPos)
   return isEqual;
 }
 
-#ifndef OS_IOS
 void IPlugBase::RedrawParamControls()
 {
   if (mGraphics)
@@ -977,7 +1014,7 @@ void IPlugBase::RedrawParamControls()
     }
   }
 }
-#endif
+
 void IPlugBase::DirtyParameters()
 {
   WDL_MutexLock lock(&mMutex);
@@ -985,7 +1022,7 @@ void IPlugBase::DirtyParameters()
   for (int p = 0; p < NParams(); p++)
   {
     double normalizedValue = GetParam(p)->GetNormalized();
-    InformHostOfParamChange(p, normalizedValue);
+	InformHostOfParamChange(p, normalizedValue);
   }
 }
 
@@ -1028,7 +1065,7 @@ void IPlugBase::DumpPresetSrcCode(const char* filename, const char* paramEnumNam
 }
 
 #ifndef MAX_BLOB_LENGTH
-#define MAX_BLOB_LENGTH 1024
+#define MAX_BLOB_LENGTH 2048
 #endif
 
 void IPlugBase::DumpPresetBlob(const char* filename)
@@ -1348,7 +1385,7 @@ bool IPlugBase::LoadProgramFromFXP(WDL_String* fileName)
       if (fxpVersion != kFXPVersionNum) return false; // TODO: what if a host saves as a different version?
       if (pluginID != GetUniqueID()) return false;
       //if (pluginVersion != GetEffectVersion(true)) return false; // TODO: provide mechanism for loading earlier versions
-      if (numParams != NParams()) return false; // TODO: provide mechanism for loading earlier versions with less params
+      //if (numParams != NParams()) return false; // TODO: provide mechanism for loading earlier versions with less params
 
       if (DoesStateChunks() && fxpMagic == 'FPCh')
       {
@@ -1356,11 +1393,11 @@ bool IPlugBase::LoadProgramFromFXP(WDL_String* fileName)
         pos = pgm.Get(&chunkSize, pos);
         chunkSize = WDL_bswap_if_le(chunkSize);
 
-				GetIPlugVerFromChunk(&pgm, &pos);
-				UnserializeState(&pgm, pos);
-				ModifyCurrentPreset(prgName);
-				RestorePreset(GetCurrentPresetIdx());
-				InformHostOfProgramChange();
+        GetIPlugVerFromChunk(&pgm, &pos);
+        UnserializeState(&pgm, pos);
+        ModifyCurrentPreset(prgName);
+        RestorePreset(GetCurrentPresetIdx());
+        InformHostOfProgramChange();
 
         return true;
       }
