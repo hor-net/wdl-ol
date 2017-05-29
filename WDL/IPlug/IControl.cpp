@@ -62,13 +62,13 @@ void IControl::SetClean()
  * Saverio: this is needed to be able to move an IControl to a new position
  */
 void IControl::Move(int x, int y) {
-	int w = mRECT.W();
-	int h = mRECT.H();
-	mRECT.L = x;
-	mRECT.T = y; 
-	mRECT.R = x + w;
-	mRECT.B = y + h;
-	mTargetRECT = mRECT;
+	int w = mDrawRECT.W();
+	int h = mDrawRECT.H();
+	mDrawRECT.L = x;
+	mDrawRECT.T = y; 
+	mDrawRECT.R = x + w;
+	mDrawRECT.B = y + h;
+	mTargetRECT = mDrawRECT;
 }
 	
 void IControl::Hide(bool hide)
@@ -127,12 +127,12 @@ void IControl::PromptUserInput()
     }
     else // text entry
     {
-      int cX = (int) mRECT.MW();
-      int cY = (int) mRECT.MH();
+      int cX = (int) mDrawRECT.MW();
+      int cY = (int) mDrawRECT.MH();
       //int halfW = int(float(PARAM_EDIT_W)/2.f);
       //int halfH = int(float(PARAM_EDIT_H)/2.f);
-			int halfW = int(float(mRECT.W())/2.f);
-			int halfH = int(float(mRECT.H())/2.f);
+			int halfW = int(float(mDrawRECT.W())/2.f);
+			int halfH = int(float(mDrawRECT.H())/2.f);
 			
       IRECT txtRECT = IRECT(cX - halfW, cY - halfH, cX + halfW,cY + halfH);
       mPlug->GetGUI()->PromptUserInput(this, mPlug->GetParam(mParamIdx), &txtRECT );
@@ -218,12 +218,6 @@ void ISwitchControl::OnMouseDown(int x, int y, IMouseMod* pMod)
   if (mBitmap->N > 1)
   {
     mValue += 1.0 / (double) (mBitmap->N - 1);
-  }
-  else
-  {
-    mValue += 1.0;
-  }
-
   } else {
 	mValue += 1.0;
   }
@@ -278,14 +272,11 @@ void ISwitchFramesControl::OnMouseDown(int x, int y, IMouseMod* pMod)
 void ISwitchFramesControl::Move(int x, int y)
 {
 	IControl::Move(x, y);
-	int n = mRECTs.GetSize();
+	int n = mDrawRECTs.GetSize();
 	for(int i = 0; i < n; i++)
 	{
-		//mRECTs.Delete(i);
-		if (mImagesAreHorizontal)
-			mRECTs.Get()[i] = mRECT.SubRectHorizontal(n, i); 
-		else
-			mRECTs.Get()[i] = mRECT.SubRectVertical(n, i); 
+		//mDrawRECTs.Delete(i);
+		mDrawRECTs.Get()[i] = mDrawRECT.SubRectVertical(n, i); 
 	}
 }
 

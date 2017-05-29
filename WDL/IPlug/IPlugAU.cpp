@@ -1093,7 +1093,7 @@ ComponentResult IPlugAU::GetProperty(AudioUnitPropertyID propID, AudioUnitScope 
           ASSERT_SCOPE(kAudioUnitScope_Global);
           
           CFStringRef string = CFSTR("midiOut");
-          CFArrayRef array = CFArrayCreate(kCFAllocatorDefault, (const void**)&string, 1, nullptr);
+          CFArrayRef array = CFArrayCreate(kCFAllocatorDefault, (const void**)&string, 1, NULL);
           CFRelease(string);
           *((CFArrayRef*)pData) = array;
 
