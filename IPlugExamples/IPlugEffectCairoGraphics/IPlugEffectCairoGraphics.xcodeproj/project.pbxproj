@@ -2362,6 +2362,11 @@
 					"$(VST_DEFS)",
 					"$(inherited)",
 				);
+				HEADER_SEARCH_PATHS = (
+					"$(IPLUG_PATH)",
+					"$(ADDITIONAL_INCLUDES)",
+					"$(VST_SDK)",
+				);
 				INFOPLIST_FILE = "resources/IPlugEffectCairoGraphics-VST2-Info.plist";
 				SKIP_INSTALL = NO;
 				WARNING_CFLAGS = "-Wno-main";
@@ -2377,6 +2382,11 @@
 					"$(VST_DEFS)",
 					"$(inherited)",
 				);
+				HEADER_SEARCH_PATHS = (
+					"$(IPLUG_PATH)",
+					"$(ADDITIONAL_INCLUDES)",
+					"$(VST_SDK)",
+				);
 				INFOPLIST_FILE = "resources/IPlugEffectCairoGraphics-VST2-Info.plist";
 				SKIP_INSTALL = NO;
 				WARNING_CFLAGS = "-Wno-main";
@@ -2391,6 +2401,11 @@
 				GCC_PREPROCESSOR_DEFINITIONS_NOT_USED_IN_PRECOMPS = (
 					"$(VST_DEFS)",
 					"$(inherited)",
+				);
+				HEADER_SEARCH_PATHS = (
+					"$(IPLUG_PATH)",
+					"$(ADDITIONAL_INCLUDES)",
+					"$(VST_SDK)",
 				);
 				INFOPLIST_FILE = "resources/IPlugEffectCairoGraphics-VST2-Info.plist";
 				SKIP_INSTALL = NO;
