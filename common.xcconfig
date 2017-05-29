@@ -25,6 +25,7 @@ DEPLOYMENT_TARGET = 10.7
 // Where the SDKs etc are located in relation to the plugin xcode project
 WDL_PATH = $(SRCROOT)/../../WDL
 IPLUG_PATH = $(WDL_PATH)/IPlug
+VST_SDK = $(SRCROOT)/../../../VST_SDK
 VST3_SDK = $(SRCROOT)/../../VST3_SDK
 PT9_SDK = $(SRCROOT)/../../PT9_SDK
 AAX_SDK = $(SRCROOT)/../../AAX_SDK
