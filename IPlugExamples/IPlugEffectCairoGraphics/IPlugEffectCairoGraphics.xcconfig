@@ -8,7 +8,9 @@ BINARY_NAME = IPlugEffectCairoGraphics
 
 ADDITIONAL_INCLUDES =  "../../YCAIRO/Cairo_Graphics/Include-Mac/cairo/" "../../YCAIRO/Cairo_Graphics/Include-Mac/" "../../YCAIRO/"
 
-ADDITIONAL_LIBRARY_PATHS = "../../YCAIRO/Cairo_Graphics/Lib-Mac/"
+//ADDITIONAL_LIBRARY_PATHS = "../../YCAIRO/Cairo_Graphics/Lib-Mac/"
+ADDITIONAL_LIBRARY_PATHS = "/Users/EcHo2K_old/GoogleDrive/vst_save/CairoBuild"
+
 
 // for jack headers
 //ADDITIONAL_APP_INCLUDES = /usr/local/include

@@ -5,7 +5,7 @@
 // after #defining either VST_API or AU_API.
 #include <stdio.h>
 #include <stdint.h>
-typedef uint32_t uint32;
+//typedef uint32_t uint32;
 
 #include "IPlugOSDetect.h"
 #include "resource.h" // This is your plugin's resource.h
