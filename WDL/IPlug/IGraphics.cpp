@@ -1533,6 +1533,8 @@ bool IGraphics::DrawIText(IText* pTxt, char* str, IRECT* pR, bool measure)
 	else // if (pTxt->mAlign == IText::kAlignFar)
 		fmt |= DT_RIGHT;
 
+	fmt |= DT_VCENTER;
+	
 	if (measure)
 	{
 		fmt |= DT_CALCRECT;
