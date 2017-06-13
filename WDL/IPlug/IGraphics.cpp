@@ -1533,7 +1533,17 @@ bool IGraphics::DrawIText(IText* pTxt, char* str, IRECT* pR, bool measure)
 	else // if (pTxt->mAlign == IText::kAlignFar)
 		fmt |= DT_RIGHT;
 
-	fmt |= DT_VCENTER;
+	if (pTxt->mValign == IText::kAlignTop) {
+		fmt |= DT_TOP;
+	} else if (pTxt->mValign == IText::kAlignBottom) {
+		fmt |= DT_BOTTOM;
+	} else {
+		fmt |= DT_VCENTER;
+#ifdef OS_WIN
+		fmt |= DT_SINGLELINE;
+#endif
+	}
+	
 	
 	if (measure)
 	{

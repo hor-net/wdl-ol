@@ -108,6 +108,7 @@ struct IText
   IColor mColor, mTextEntryBGColor, mTextEntryFGColor;
   enum EStyle { kStyleNormal, kStyleBold, kStyleItalic } mStyle;
   enum EAlign { kAlignNear, kAlignCenter, kAlignFar } mAlign;
+	enum EValign { kAlignTop, kAlignBottom, kAlignMiddle } mValign;
   int mOrientation;   // Degrees ccwise from normal.
   enum EQuality { kQualityDefault, kQualityNonAntiAliased, kQualityAntiAliased, kQualityClearType } mQuality;
   LICE_IFont* mCached;
@@ -117,6 +118,7 @@ struct IText
         char* font = 0,
         EStyle style = kStyleNormal,
         EAlign align = kAlignCenter,
+				EValign valign = kAlignTop,
         int orientation = 0,
         EQuality quality = kQualityDefault,
         const IColor* pTEBGColor = 0,
@@ -125,6 +127,7 @@ struct IText
     , mColor(pColor ? *pColor : DEFAULT_TEXT_COLOR)
     , mStyle(style)
     , mAlign(align)
+		, mValign(valign)
     , mOrientation(orientation)
     , mQuality(quality)
     , mCached(0)
@@ -139,6 +142,7 @@ struct IText
     , mColor(*pColor)
     , mStyle(kStyleNormal)
     , mAlign(kAlignCenter)
+		, mValign(kAlignTop)
     , mOrientation(0)
     , mQuality(kQualityDefault)
     , mCached(0)

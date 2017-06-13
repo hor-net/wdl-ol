@@ -755,7 +755,7 @@ bool IBitmapOverlayControl::Draw(IGraphics* pGraphics)
 void ITextControl::AfterGUIResize(double guiScaleRatio)
 {
 	mText = IText((int)((double)defaultText.mSize * guiScaleRatio), &mText.mColor,
-		mText.mFont, mText.mStyle, mText.mAlign, mText.mOrientation,
+		mText.mFont, mText.mStyle, mText.mAlign, mText.mValign, mText.mOrientation,
 		mText.mQuality, &mText.mTextEntryBGColor, &mText.mTextEntryFGColor);
 }
 
