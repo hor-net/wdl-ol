@@ -1618,6 +1618,8 @@ LICE_IFont* IGraphics::CacheFont(IText* pTxt)
 		if (!resized && font->GetLineHeight() != h)
 		{
 			h = int((double)(h * h) / (double)font->GetLineHeight() + 0.5);
+			// compensate for the different DPI of mac vs windows
+			h *= 0.9;
 			resized = true;
 			goto Resize;
 		}
