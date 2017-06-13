@@ -56,3 +56,6 @@ IPlugExamples/build_errors.log
 WDL/lice/glew/include/GL/WGLEXT.H
 *.opendb
 IControl.cpp.orig
+YCAIRO/Cairo_Graphics/Lib-Win/cairo-Win32-Debug.lib
+YCAIRO/Cairo_Graphics/Lib-Win/cairo-Win32-Release.lib
+YCAIRO/Cairo_Graphics/Lib-Win/cairo-x64-Release.lib
