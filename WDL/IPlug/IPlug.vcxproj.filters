@@ -12,9 +12,9 @@
     <ClCompile Include="IPlugStructs.cpp" />
     <ClCompile Include="IPopupMenu.cpp" />
     <ClCompile Include="Log.cpp" />
-    <ClCompile Include="..\..\YCAIRO\ycairo.cpp" />
     <ClCompile Include="IPlugGUILiveEdit.cpp" />
     <ClCompile Include="IControlGroup.cpp" />
+    <ClCompile Include="..\..\YCAIRO\ycairo.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Containers.h" />
