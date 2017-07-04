@@ -1,7 +1,7 @@
 #include "IGraphics.h"
 #include "IPlugGUIResize.h"
 
-#define DEFAULT_FPS 120
+#define DEFAULT_FPS 60
 
 // If not dirty for this many timer ticks, we call OnGUIIDle.
 // Only looked at if USE_IDLE_CALLS is defined.
