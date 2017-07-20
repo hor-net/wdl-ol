@@ -33,6 +33,7 @@ void IControl::SetDirty(bool pushParamToPlug)
 {
   mValue = BOUNDED(mValue, mClampLo, mClampHi);
   mDirty = true;
+	mRedraw = true;
   if (pushParamToPlug && mPlug && mParamIdx >= 0)
   {
     mPlug->SetParameterFromGUI(mParamIdx, mValue);
