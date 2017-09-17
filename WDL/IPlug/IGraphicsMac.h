@@ -84,11 +84,6 @@ public:
     bool WindowIsOpen();
     void Resize(int w, int h);
     
-    void ResizePluginView(int w, int h, bool resizeSuperView = false);
-    void ResizeWindowContainingPlugin(int w, int h);
-    
-    void SetMouseCursor(ECursor cursor);
-    
     void HideMouseCursor();
     void ShowMouseCursor();
     
@@ -134,10 +129,8 @@ private:
     IGraphicsCarbon* mGraphicsCarbon;
 #endif
     void* mGraphicsCocoa;   // Can't forward-declare IGraphicsCocoa because it's an obj-C object.
-    void* cocoaVstHost;
     
     WDL_String mBundleID;
-    IPlugBase *mPlugBaseHostDetect;
     
     friend int GetMouseOver(IGraphicsMac* pGraphics);
     
