@@ -594,8 +594,9 @@
 					"$(inherited)",
 					"$(PROJECT_DIR)/build-mac/Debug",
 				);
+				MACOSX_DEPLOYMENT_TARGET = 10.7;
 				PRODUCT_NAME = lice;
-				SDKROOT = macosx10.6;
+				SDKROOT = macosx10.12;
 				SKIP_INSTALL = YES;
 				SYMROOT = "build-mac";
 			};
@@ -620,8 +621,9 @@
 					"$(inherited)",
 					"$(PROJECT_DIR)/build-mac/Debug",
 				);
+				MACOSX_DEPLOYMENT_TARGET = 10.7;
 				PRODUCT_NAME = lice;
-				SDKROOT = macosx10.6;
+				SDKROOT = macosx10.12;
 				SKIP_INSTALL = YES;
 				STRIP_INSTALLED_PRODUCT = YES;
 				STRIP_STYLE = "non-global";
@@ -643,10 +645,10 @@
 				GCC_VERSION = "";
 				GCC_WARN_ABOUT_RETURN_TYPE = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				MACOSX_DEPLOYMENT_TARGET = 10.6;
+				MACOSX_DEPLOYMENT_TARGET = 10.7;
 				ONLY_ACTIVE_ARCH = NO;
 				PREBINDING = NO;
-				SDKROOT = macosx10.6;
+				SDKROOT = macosx10.12;
 				SYMROOT = "build-mac";
 			};
 			name = Debug;
@@ -664,10 +666,10 @@
 				GCC_VERSION = "";
 				GCC_WARN_ABOUT_RETURN_TYPE = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				MACOSX_DEPLOYMENT_TARGET = 10.6;
+				MACOSX_DEPLOYMENT_TARGET = 10.7;
 				ONLY_ACTIVE_ARCH = NO;
 				PREBINDING = NO;
-				SDKROOT = macosx10.6;
+				SDKROOT = macosx10.12;
 				SYMROOT = "build-mac";
 			};
 			name = Release;
