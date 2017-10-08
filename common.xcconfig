@@ -13,14 +13,14 @@ COMPILER = com.apple.compilers.llvm.clang.1_0 // or this with xcode4+/10.7+
 //BASE_SDK = macosx10.8
 //BASE_SDK = macosx10.9
 //BASE_SDK = macosx10.10
-BASE_SDK = macosx10.6
-//BASE_SDK = macosx10.12
+//BASE_SDK = macosx10.6
+BASE_SDK = macosx10.12
 
 CLANG_CXX_LANGUAGE_STANDARD = c++11
 CLANG_CXX_LIBRARY = libc++
 
 // the minimum OS to support (don't go below 10.7)
-DEPLOYMENT_TARGET = 10.6
+DEPLOYMENT_TARGET = 10.7
 
 // Where the SDKs etc are located in relation to the plugin xcode project
 WDL_PATH = $(SRCROOT)/../../WDL
