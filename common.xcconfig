@@ -3,29 +3,30 @@
 // along with some other global build variables
 
 // this is used for Developer ID / Appstore code-signing and is used in the makedist-mac shell script
-CERTIFICATE_ID = Youlean
+CERTIFICATE_ID = Oliver Larkin
 
 // Which compiler to use
+//COMPILER = com.apple.compilers.gcc.4_2 // use this with xcode3
+//COMPILER = com.intel.compilers.icc.12_1_0
+//COMPILER = com.apple.compilers.llvmgcc42 // use this ...
 COMPILER = com.apple.compilers.llvm.clang.1_0 // or this with xcode4+/10.7+
 
 // which osx sdk to compile against - BASE_SDK rather than SDKROOT so we can override other xcconfigs (avid's)
+//BASE_SDK = macosx10.9
+//BASE_SDK = macosx10.6
 //BASE_SDK = macosx10.7 // Carbon GUIs do not work fully with the 10.7 or higher sdks
 //BASE_SDK = macosx10.8
-//BASE_SDK = macosx10.9
-//BASE_SDK = macosx10.10
-//BASE_SDK = macosx10.6
 BASE_SDK = macosx10.12
 
-CLANG_CXX_LANGUAGE_STANDARD = c++11
-CLANG_CXX_LIBRARY = libc++
+//CLANG_CXX_LANGUAGE_STANDARD = c++0x
+//CLANG_CXX_LIBRARY = libc++
 
-// the minimum OS to support (don't go below 10.7)
+// the minimum OS to support
 DEPLOYMENT_TARGET = 10.7
 
 // Where the SDKs etc are located in relation to the plugin xcode project
 WDL_PATH = $(SRCROOT)/../../WDL
 IPLUG_PATH = $(WDL_PATH)/IPlug
-VST_SDK = $(SRCROOT)/../../../VST_SDK
 VST3_SDK = $(SRCROOT)/../../VST3_SDK
 PT9_SDK = $(SRCROOT)/../../PT9_SDK
 AAX_SDK = $(SRCROOT)/../../AAX_SDK
