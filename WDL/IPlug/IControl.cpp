@@ -147,8 +147,17 @@ void IControl::PromptUserInput(IRECT* pTextRect)
 {
   if (mParamIdx >= 0 && !mDisablePrompt)
   {
-    mPlug->GetGUI()->PromptUserInput(this, mPlug->GetParam(mParamIdx), pTextRect);
-    Redraw();
+    //mPlug->GetGUI()->PromptUserInput(this, mPlug->GetParam(mParamIdx), pTextRect);
+	  int cX = (int)pTextRect->MW();
+	  int cY = (int)pTextRect->MH();
+	  //int halfW = int(float(PARAM_EDIT_W)/2.f);
+	  //int halfH = int(float(PARAM_EDIT_H)/2.f);
+	  int halfW = int(float(pTextRect->W()) / 2.f);
+	  int halfH = int(float(pTextRect->H()) / 2.f);
+
+	  IRECT txtRECT = IRECT(cX - halfW, cY - halfH, cX + halfW, cY + halfH);
+	  mPlug->GetGUI()->PromptUserInput(this, mPlug->GetParam(mParamIdx), &txtRECT);
+	Redraw();
   }
 }
 
@@ -690,6 +699,7 @@ bool IKnobMultiControlText::Draw(IGraphics* pGraphics)
 	if (CSTR_NOT_EMPTY(cStr)) {
 		// measure the text size
 		pGraphics->DrawIText(&mText, mStr.Get(), &mTextRECT,true);
+		mTextRECT.B = mTextRECT.T + mText.mSize + 4;
 		// draw text
 		return pGraphics->DrawIText(&mText, mStr.Get(), &mTextRECT);
 	}
