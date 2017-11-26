@@ -591,6 +591,7 @@
 				INSTALL_PATH = /usr/local/lib;
 				MACOSX_DEPLOYMENT_TARGET = "$(DEPLOYMENT_TARGET)";
 				PRODUCT_NAME = lice;
+				SDKROOT = macosx10.12;
 				SKIP_INSTALL = YES;
 				SYMROOT = "build-mac";
 			};
@@ -613,6 +614,7 @@
 				INSTALL_PATH = /usr/local/lib;
 				MACOSX_DEPLOYMENT_TARGET = "$(DEPLOYMENT_TARGET)";
 				PRODUCT_NAME = lice;
+				SDKROOT = macosx10.12;
 				SKIP_INSTALL = YES;
 				STRIP_INSTALLED_PRODUCT = YES;
 				STRIP_STYLE = "non-global";
