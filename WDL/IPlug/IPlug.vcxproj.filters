@@ -30,8 +30,8 @@
     <ClInclude Include="IPlugStructs.h" />
     <ClInclude Include="IPopupMenu.h" />
     <ClInclude Include="Log.h" />
-    <ClInclude Include="..\..\YCAIRO\ycairo.h" />
     <ClInclude Include="IPlugGUILiveEdit.h" />
     <ClInclude Include="IControlGroup.h" />
+    <ClInclude Include="..\..\YCAIRO\ycairo.h" />
   </ItemGroup>
 </Project>
