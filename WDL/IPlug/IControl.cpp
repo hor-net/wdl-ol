@@ -679,6 +679,7 @@ bool IKnobMultiControlText::Draw(IGraphics* pGraphics)
 	if (CSTR_NOT_EMPTY(cStr)) {
 		// measure the text size
 		pGraphics->DrawIText(&mText, mStr.Get(), &mTextRECT,true);
+		mTextRECT.B = mTextRECT.T + mText.mSize + 4;
 		// draw text
 		return pGraphics->DrawIText(&mText, mStr.Get(), &mTextRECT);
 	}
