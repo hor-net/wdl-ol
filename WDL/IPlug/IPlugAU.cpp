@@ -987,8 +987,50 @@ OSStatus IPlugAU::GetProperty(AudioUnitPropertyID propID, AudioUnitScope scope, 
 
 #if MAC_OS_X_VERSION_MAX_ALLOWED > 1040
     NO_OP(kAudioUnitProperty_AUHostIdentifier);           // 46,
-    NO_OP(kAudioUnitProperty_MIDIOutputCallbackInfo);     // 47,
-    NO_OP(kAudioUnitProperty_MIDIOutputCallback);         // 48,
+    case kAudioUnitProperty_MIDIOutputCallbackInfo:
+    {
+      ASSERT_SCOPE(kAudioUnitScope_Global);
+     
+      if(DoesMIDI())
+      {
+        if (pData)
+        {
+          CFStringRef strs[1];
+          strs[0] = CFSTR("MIDI Callback");
+          
+          CFArrayRef callbackArray = CFArrayCreate(NULL, (const void **)strs, 1, &kCFTypeArrayCallBacks);
+          *(CFArrayRef *) pData = callbackArray;
+        }
+        else 
+        {
+          *pDataSize = sizeof(CFArrayRef);
+          *pWriteable = false;
+        }
+
+        return noErr;
+      }
+      else 
+      {
+        return badComponentSelector;
+      }
+
+    }
+    case kAudioUnitProperty_MIDIOutputCallback:        // 48,
+    {
+      ASSERT_SCOPE(kAudioUnitScope_Global);
+      
+      if(DoesMIDI())
+      {
+        *pDataSize = sizeof(AUMIDIOutputCallbackStruct);
+        *pWriteable = true;
+      
+        return noErr;
+      }
+      else 
+      {
+        return badComponentSelector;
+      }
+    }
     NO_OP(kAudioUnitProperty_InputSamplesInOutput);       // 49,
     NO_OP(kAudioUnitProperty_ClassInfoFromDocument);      // 50
 #endif
@@ -1187,8 +1229,32 @@ OSStatus IPlugAU::SetProperty(AudioUnitPropertyID propID, AudioUnitScope scope, 
       OnHostIdentified();
       return noErr;
     }
-    NO_OP(kAudioUnitProperty_MIDIOutputCallbackInfo);   // 47,
-    NO_OP(kAudioUnitProperty_MIDIOutputCallback);       // 48,
+    NO_OP(kAudioUnitProperty_MIDIOutputCallbackInfo)   // 47,
+    case kAudioUnitProperty_MIDIOutputCallback:       // 48,
+    {
+      ASSERT_SCOPE(kAudioUnitScope_Global);
+      
+      if (DoesMIDI())
+      {
+        //if (*pDataSize < sizeof(AUMIDIOutputCallbackStruct)) return kAudioUnitErr_InvalidPropertyValue;
+        
+        AUMIDIOutputCallbackStruct *callbackStruct = (AUMIDIOutputCallbackStruct *) pData;
+        
+        if(callbackStruct)
+        {
+          mMidiCallback = *callbackStruct;
+          return noErr;
+        }
+        else 
+        {
+          return kAudioUnitErr_InvalidProperty;
+        }
+      }
+      else 
+      {
+        return kAudioUnitErr_InvalidProperty;
+      }
+    }
     NO_OP(kAudioUnitProperty_InputSamplesInOutput);       // 49,
     NO_OP(kAudioUnitProperty_ClassInfoFromDocument)       // 50
 #endif
@@ -1721,6 +1787,29 @@ OSStatus IPlugAU::RenderProc(void* pPlug, AudioUnitRenderActionFlags* pFlags, co
       RenderCallback(pRN, &flags, pTimestamp, outputBusIdx, nFrames, pOutBufList);
     }
   }
+  
+#pragma mark MIDIOUT
+  if(_this->mMidiCallback.midiOutputCallback && !_this->mMidiOutputQueue.Empty() | _this->mSysexOutputQueue.Available())
+  {
+    MIDIPacketList packetList;
+    MIDIPacket *packet = MIDIPacketListInit( &packetList );
+    
+    while (!_this->mMidiOutputQueue.Empty())
+    {
+      IMidiMsg* pMsg = _this->mMidiOutputQueue.Peek();
+      
+      packet = MIDIPacketListAdd( &packetList, sizeof(packetList), packet, pMsg->mOffset /* correct timestamp? */, 3, (const Byte *) &pMsg->mStatus );
+
+      _this->mMidiOutputQueue.Remove();
+    }
+    
+//    while (_this->mSysexOutputQueue.Available()) 
+//    {
+//      ISysEx* pSysex = _this->mSysexOutputQueue.Get(
+//    }
+
+    _this->mMidiCallback.midiOutputCallback(_this->mMidiCallback.userData, pTimestamp, 0, &packetList);
+  }  
 
   return noErr;
 }
@@ -2069,6 +2158,7 @@ void IPlugAU::SetBlockSize(int blockSize)
   mOutScratchBuf.Resize(nOut);
   memset(mInScratchBuf.Get(), 0, nIn * sizeof(AudioSampleType));
   memset(mOutScratchBuf.Get(), 0, nOut * sizeof(AudioSampleType));
+  mMidiOutputQueue.Resize(blockSize);
   IPlugBase::SetBlockSize(blockSize);
 }
 
@@ -2105,9 +2195,24 @@ void IPlugAU::SetLatency(int samples)
   IPlugBase::SetLatency(samples);
 }
 
-// TODO: SendMidiMsg
 bool IPlugAU::SendMidiMsg(IMidiMsg* pMsg)
 {
+  if(mMidiCallback.midiOutputCallback)
+  {
+    mMidiOutputQueue.Add(pMsg);
+    return true;
+  }
+
+  return false;
+}
+
+bool IPlugAU::SendSysEx(ISysEx* pSysEx)
+{
+//  if(mMidiCallback.midiOutputCallback)
+//  {
+//    return true;
+//  }
+//  
   return false;
 }
 
@@ -2489,4 +2594,3 @@ OSStatus IPlugAU::DoSysEx(IPlugAU *_this, const UInt8 *inData, UInt32 inLength)
   else
     return badComponentSelector;
 }
-

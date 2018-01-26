@@ -3,7 +3,9 @@
 // Only load one API class!
 
 #include "IPlugBase.h"
+#include "IMidiQueue.h"
 #include <CoreServices/CoreServices.h>
+#include <CoreMIDI/MIDIServices.h>
 #include <AudioUnit/AUComponent.h>
 #include <AudioUnit/AudioUnitProperties.h>
 #include <AudioToolbox/AudioUnitUtilities.h>
@@ -96,6 +98,7 @@ protected:
   void SetBlockSize(int blockSize);
   void SetLatency(int samples);
   bool SendMidiMsg(IMidiMsg* pMsg);
+  bool SendSysEx(ISysEx* pSysEx);
   void HostSpecificInit();
   
 private:
@@ -112,7 +115,7 @@ private:
   WDL_TypedBuf<AudioSampleType> mInScratchBuf, mOutScratchBuf;
   WDL_PtrList<AURenderCallbackStruct> mRenderNotify;
   AUMIDIOutputCallbackStruct mMidiCallback;
-
+  IMidiQueue mMidiOutputQueue;
   // Every stereo pair of plugin input or output is a bus.
   // Buses can have zero host channels if the host hasn't connected the bus at all,
   // one host channel if the plugin supports mono and the host has supplied a mono stream,
