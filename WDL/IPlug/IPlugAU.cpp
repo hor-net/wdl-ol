@@ -1789,7 +1789,8 @@ OSStatus IPlugAU::RenderProc(void* pPlug, AudioUnitRenderActionFlags* pFlags, co
   }
   
 #pragma mark MIDIOUT
-  if(_this->mMidiCallback.midiOutputCallback && !_this->mMidiOutputQueue.Empty() | _this->mSysexOutputQueue.Available())
+  //if(_this->mMidiCallback.midiOutputCallback && !_this->mMidiOutputQueue.Empty() | _this->mSysexOutputQueue.Available())
+	if(_this->mMidiCallback.midiOutputCallback && !_this->mMidiOutputQueue.Empty())
   {
     MIDIPacketList packetList;
     MIDIPacket *packet = MIDIPacketListInit( &packetList );
