@@ -29,6 +29,9 @@ class ycairo_base;
 class IPlugBase
 {
 public:
+	
+	enum ParamChangeSource { kReset, kAutomation, kPresetRecall, kGUI, kUnknown };
+	
   // Use IPLUG_CTOR instead of calling directly (defined in IPlug_include_in_plug_src.h).
   IPlugBase(int nParams,
             const char* channelIOStr,
