@@ -187,10 +187,8 @@ LICE_IBitmap* LoadImgFromResourceOSX(const char* bundleID, const char* filename)
   #endif
 
   NSBundle* pBundle = [NSBundle bundleWithIdentifier:ToNSString(bundleID)];
-  //NSString* pFile = [[[NSString stringWithCString:filename] lastPathComponent] stringByDeletingPathExtension];
-  //AH_CHANGE - I don't see why we can't use subfolders here?
-  NSString* pFile = [[NSString stringWithCString:filename] stringByDeletingPathExtension];
-  
+  NSString* pFile = [[[NSString stringWithCString:filename] lastPathComponent] stringByDeletingPathExtension];
+	
   if (pBundle && pFile)
   {
     NSString* pPath = 0;
