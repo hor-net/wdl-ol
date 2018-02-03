@@ -412,15 +412,15 @@ tresult PLUGIN_API IPlugVST3::process(ProcessData& data)
                 if (GetGUI()) GetGUI()->SetParameterFromPlug(idx, (double)value, true);
                 OnParamChange(idx, kAutomation);
               }
-		// if idx is > than NParams() we have MIDI CC
-		else if (idx >= NParams() && DoesMIDI())
-		{
-			int midiCCNum = idx - NParams();
-			IMidiMsg msg;
-			msg.MakeControlChangeMsg((IMidiMsg::EControlChangeMsg)midiCCNum, value, 0);
-			ProcessMidiMsg(&msg);
-		}
-		break;
+							// if idx is > than NParams() we have MIDI CC
+							else if (idx >= NParams() && DoesMIDI())
+							{
+								int midiCCNum = idx - NParams();
+								IMidiMsg msg;
+								msg.MakeControlChangeMsg((IMidiMsg::EControlChangeMsg)midiCCNum, value, 0);
+								ProcessMidiMsg(&msg);
+							}
+							break;
           }
 
         }
