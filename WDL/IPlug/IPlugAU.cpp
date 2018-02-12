@@ -2252,7 +2252,7 @@ OSStatus IPlugAU::DoInitialize(IPlugAU *_this)
     return badComponentSelector;
   }
   _this->mActive = true;
-  _this->OnParamReset();
+  _this->OnParamReset(kReset);
   _this->OnActivate(true);
   
   return noErr;
