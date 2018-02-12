@@ -1551,6 +1551,7 @@ OSStatus IPlugAU::SetParamProc(void* pPlug, AudioUnitParameterID paramID, AudioU
     _this->GetGUI()->SetParameterFromPlug(paramID, value, false);
   }
   _this->OnParamChange(paramID, kAutomation);
+#endif
   return noErr;
 }
 
