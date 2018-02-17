@@ -551,10 +551,10 @@ void IPlugBase::OnParamReset(ParamChangeSource source)
   //Reset();
 }
 
-void IPlugBase::OnParamReset()
-{
-	OnParamReset(false);
-}
+//void IPlugBase::OnParamReset(ParamChangeSource source)
+//{
+//	OnParamReset(kUnknown);
+//}
 
 // Default passthrough.
 void IPlugBase::ProcessDoubleReplacing(double** inputs, double** outputs, int nFrames)
@@ -578,19 +578,19 @@ void IPlugBase::ProcessDoubleReplacing(double** inputs, double** outputs, int nF
 }
 
 // Default passthrough ONLY USED BY IOS.
-void IPlugBase::ProcessSingleReplacing(float** inputs, float** outputs, int nFrames)
-{
-  // Mutex is already locked.
-  int i, nIn = mInChannels.GetSize(), nOut = mOutChannels.GetSize();
-  for (i = 0; i < nIn; ++i)
-  {
-    memcpy(outputs[i], inputs[i], nFrames * sizeof(float));
-  }
-  for (/* same i */; i < nOut; ++i)
-  {
-    memset(outputs[i], 0, nFrames * sizeof(float));
-  }
-}
+//void IPlugBase::ProcessSingleReplacing(float** inputs, float** outputs, int nFrames)
+//{
+//  // Mutex is already locked.
+//  int i, nIn = mInChannels.GetSize(), nOut = mOutChannels.GetSize();
+//  for (i = 0; i < nIn; ++i)
+//  {
+//    memcpy(outputs[i], inputs[i], nFrames * sizeof(float));
+//  }
+//  for (/* same i */; i < nOut; ++i)
+//  {
+//    memset(outputs[i], 0, nFrames * sizeof(float));
+//  }
+//}
 
 // Default passthrough.
 void IPlugBase::ProcessMidiMsg(IMidiMsg* pMsg)
