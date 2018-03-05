@@ -152,6 +152,12 @@ public:
 	void RescaleBitmaps(double guiScaleRatio);
 	void SetBitmapOversample(unsigned oversample) { bitmapOversample = oversample; }
 	//--------------------------------------------------------------------------------------------------------
+
+	virtual double GetSystemGUIScaleRatio() = 0;
+
+	// This is only active if IPlugGUIResizing is active
+	bool IsUsingSystemGUIScaling() { return useSystemGUIScaling; }
+	void UseSystemGUIScaling() { useSystemGUIScaling = true; }
 	
 	IPlugBase* GetPlug() { return mPlug; }
 
@@ -208,6 +214,9 @@ public:
 	void OnMouseWheel(int x, int y, IMouseMod* pMod, int d);
 	bool OnKeyDown(int x, int y, int key);
 
+	enum ECursor { ARROW, IBEAM, WAIT, CROSS, UPARROW, SIZENWSE, SIZENESW, SIZEWE, SIZENS, SIZEALL, INO, HAND, APPSTARTING, HELP };
+
+	virtual void SetMouseCursor(ECursor cursor) {};
 	virtual void HideMouseCursor() {};
 	virtual void ShowMouseCursor() {};
 
@@ -297,6 +306,7 @@ private:
 	bool mHandleMouseOver, mStrict, mEnableTooltips, mShowControlBounds;
 	IControl* mKeyCatcher;
 
+	bool useSystemGUIScaling = false;
 	unsigned bitmapOversample = 1;
 	double guiScaleRatio = 1.0;
 	int viewMode = 0;

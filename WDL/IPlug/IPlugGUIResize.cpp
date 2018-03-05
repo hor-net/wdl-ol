@@ -139,13 +139,13 @@ IPlugGUIResize::IPlugGUIResize(IPlugBase* pPlug, IGraphics* pGraphics, bool useH
 	settings_ini_path.Append(pPlug->GetMfrName());
 
 	// Create directory if it doesn't exist
-	CreateDirectory(settings_ini_path.Get(), NULL);
+	fileSystem.DirCreate(settings_ini_path.Get());
 
 	settings_ini_path.Append("/");
 	settings_ini_path.Append(pPlug->GetEffectName());
 
 	// Create directory if it doesn't exist
-	CreateDirectory(settings_ini_path.Get(), NULL);
+	fileSystem.DirCreate(settings_ini_path.Get());
 
 	settings_ini_path.Append("/Settings.ini");
 
@@ -1392,6 +1392,9 @@ void IPlugGUIResize::ResizeAtGUIOpen()
 	}
 
 	gui_scale_ratio = GetDoubleFromFile("guiscale");
+
+	if (mGraphics->IsUsingSystemGUIScaling()) gui_scale_ratio *= mGraphics->GetSystemGUIScaleRatio();
+
 	mGraphics->guiScaleRatio = gui_scale_ratio;
 
 	plugin_width = (int)(window_width_normalized * gui_scale_ratio);
@@ -1427,6 +1430,8 @@ void IPlugGUIResize::ResizeGraphics()
 {
 	bool window_resizing = false;
 
+	if (mGraphics->IsUsingSystemGUIScaling()) gui_scale_ratio /= mGraphics->GetSystemGUIScaleRatio();
+
 	if (double_equals(GetDoubleFromFile("guiscale"), gui_scale_ratio))
 	{
 		window_resizing = true;
@@ -1435,6 +1440,8 @@ void IPlugGUIResize::ResizeGraphics()
 	{
 		SetDoubleToFile("guiscale", gui_scale_ratio);
 	}
+
+	if (mGraphics->IsUsingSystemGUIScaling()) gui_scale_ratio *= mGraphics->GetSystemGUIScaleRatio();
 
 	mGraphics->guiScaleRatio = gui_scale_ratio;
 
@@ -1530,7 +1537,7 @@ void IPlugGUIResize::OnMouseDrag(int x, int y, int dX, int dY, IMouseMod * pMod)
 {
 	if (!gui_should_be_closed)
 	{
-		SetCursor(LoadCursor(NULL, IDC_SIZENWSE));
+		mGraphics->SetMouseCursor(IGraphics::ECursor::SIZENWSE);
 
 		if (handle_controls_gui_scaling || (control_and_click_on_handle_controls_gui_scaling && pMod->C))
 		{
@@ -1573,18 +1580,18 @@ void IPlugGUIResize::OnMouseDrag(int x, int y, int dX, int dY, IMouseMod * pMod)
 void IPlugGUIResize::OnMouseOver(int x, int y, IMouseMod * pMod)
 {
 	if (!gui_should_be_closed)
-		SetCursor(LoadCursor(NULL, IDC_SIZENWSE));
+		mGraphics->SetMouseCursor(IGraphics::ECursor::SIZENWSE);
 }
 
 void IPlugGUIResize::OnMouseOut()
 {
-	SetCursor(LoadCursor(NULL, IDC_ARROW));
+	mGraphics->SetMouseCursor(IGraphics::ECursor::ARROW);
 }
 
 void IPlugGUIResize::OnMouseDown(int x, int y, IMouseMod * pMod)
 {
 	if (!gui_should_be_closed)
-		SetCursor(LoadCursor(NULL, IDC_SIZENWSE));
+		mGraphics->SetMouseCursor(IGraphics::ECursor::SIZENWSE);
 
 	if (pMod->L && using_bitmaps && fast_bitmap_resizing && handle_controls_gui_scaling && !gui_should_be_closed)
 	{
@@ -1618,7 +1625,7 @@ void IPlugGUIResize::ResizeBackground()
 
 void IPlugGUIResize::OnMouseUp(int x, int y, IMouseMod * pMod)
 {
-	SetCursor(LoadCursor(NULL, IDC_ARROW));
+	mGraphics->SetMouseCursor(IGraphics::ECursor::ARROW);
 
 	if (using_bitmaps && fast_bitmap_resizing && !gui_should_be_closed)
 	{
@@ -1633,27 +1640,40 @@ void IPlugGUIResize::OnMouseUp(int x, int y, IMouseMod * pMod)
 	}
 }
 
-void IPlugGUIResize::SetIntToFile(const char * name, int x)
+void IPlugGUIResize::SetIntToFile(const char * name,unsigned int x)
 {
-	sprintf(buf, "%u", x);
-	WritePrivateProfileString("gui", name, buf, settings_ini_path.Get());
+	configFile.SetFilePath(settings_ini_path.Get());
+	configFile.ReadFile();
+
+	configFile.WriteValue(name, x, "gui");
+
+	configFile.WriteFile();
 }
 
 int IPlugGUIResize::GetIntFromFile(const char * name)
 {
-	return GetPrivateProfileInt("gui", name, -1, settings_ini_path.Get());
+	configFile.SetFilePath(settings_ini_path.Get());
+	configFile.ReadFile();
+
+	return configFile.ReadValue<int>(name, -1, "gui");
 }
 
 void IPlugGUIResize::SetDoubleToFile(const char * name, double x)
 {
-	sprintf(buf, "%.15f", x);
-	WritePrivateProfileString("gui", name, buf, settings_ini_path.Get());
+	configFile.SetFilePath(settings_ini_path.Get());
+	configFile.ReadFile();
+
+	configFile.WriteValue(name, x, "gui");
+
+	configFile.WriteFile();
 }
 
 double IPlugGUIResize::GetDoubleFromFile(const char * name)
 {
-	GetPrivateProfileString("gui", name, "-1.0", buf, 128, settings_ini_path.Get());
-	return atof(buf);
+	configFile.SetFilePath(settings_ini_path.Get());
+	configFile.ReadFile();
+
+	return configFile.ReadValue<double>(name, -1.0, "gui");
 }
 
 bool IPlugGUIResize::IsDirty()
@@ -1688,12 +1708,12 @@ bool HorisontalResizing::Draw(IGraphics * pGraphics)
 
 void HorisontalResizing::OnMouseDown(int x, int y, IMouseMod * pMod)
 {
-	SetCursor(LoadCursor(NULL, IDC_SIZEWE));
+	mGraphics->SetMouseCursor(IGraphics::ECursor::SIZEWE);
 }
 
 void HorisontalResizing::OnMouseDrag(int x, int y, int dX, int dY, IMouseMod * pMod)
 {
-	SetCursor(LoadCursor(NULL, IDC_SIZEWE));
+	mGraphics->SetMouseCursor(IGraphics::ECursor::SIZEWE);
 
 	double window_width_normalized = (double)x / GetGUIResize()->GetGUIScaleRatio();
 
@@ -1704,12 +1724,12 @@ void HorisontalResizing::OnMouseDrag(int x, int y, int dX, int dY, IMouseMod * p
 
 void HorisontalResizing::OnMouseOver(int x, int y, IMouseMod * pMod)
 {
-	SetCursor(LoadCursor(NULL, IDC_SIZEWE));
+	mGraphics->SetMouseCursor(IGraphics::ECursor::SIZEWE);
 }
 
 void HorisontalResizing::OnMouseOut()
 {
-	SetCursor(LoadCursor(NULL, IDC_ARROW));
+	mGraphics->SetMouseCursor(IGraphics::ECursor::ARROW);
 }
 
 
@@ -1729,12 +1749,12 @@ bool VerticalResizing::Draw(IGraphics * pGraphics)
 
 void VerticalResizing::OnMouseDown(int x, int y, IMouseMod * pMod)
 {
-	SetCursor(LoadCursor(NULL, IDC_SIZENS));
+	mGraphics->SetMouseCursor(IGraphics::ECursor::SIZENS);
 }
 
 void VerticalResizing::OnMouseDrag(int x, int y, int dX, int dY, IMouseMod * pMod)
 {
-	SetCursor(LoadCursor(NULL, IDC_SIZENS));
+	mGraphics->SetMouseCursor(IGraphics::ECursor::SIZENS);
 
 	double window_height_normalized = (double)y / GetGUIResize()->GetGUIScaleRatio();
 
@@ -1745,10 +1765,10 @@ void VerticalResizing::OnMouseDrag(int x, int y, int dX, int dY, IMouseMod * pMo
 
 void VerticalResizing::OnMouseOver(int x, int y, IMouseMod * pMod)
 {
-	SetCursor(LoadCursor(NULL, IDC_SIZENS));
+	mGraphics->SetMouseCursor(IGraphics::ECursor::SIZENS);
 }
 
 void VerticalResizing::OnMouseOut()
 {
-	SetCursor(LoadCursor(NULL, IDC_ARROW));
+	mGraphics->SetMouseCursor(IGraphics::ECursor::ARROW);
 }

@@ -228,10 +228,22 @@ inline int GetMouseOver(IGraphicsMac* pGraphics)
   mGraphics = pGraphics;
   NSRect r;
   r.origin.x = r.origin.y = 0.0f;
-  r.size.width = (float) pGraphics->Width();
-  r.size.height = (float) pGraphics->Height();
-  self = [super initWithFrame:r];
+    
+    if (mGraphics->GetPlug()->GetGUIResize() && mGraphics->IsUsingSystemGUIScaling())
+    {
+        double systemScaleRatio = mGraphics->GetSystemGUIScaleRatio();
+        
+        r.size.width = (float) pGraphics->Width() / systemScaleRatio;
+        r.size.height = (float) pGraphics->Height() / systemScaleRatio;
+    }
+    else
+    {
+        r.size.width = (float) pGraphics->Width();
+        r.size.height = (float) pGraphics->Height();
+    }
 
+  self = [super initWithFrame:r];
+    
   double sec = 1.0 / (double) pGraphics->FPS();
   mTimer = [NSTimer timerWithTimeInterval:sec target:self selector:@selector(onTimer:) userInfo:nil repeats:YES];
   [[NSRunLoop currentRunLoop] addTimer: mTimer forMode: (NSString*) kCFRunLoopCommonModes];
@@ -287,8 +299,28 @@ inline int GetMouseOver(IGraphicsMac* pGraphics)
   if (mGraphics)
   {
     NSPoint pt = [self convertPoint:[pEvent locationInWindow] fromView:nil];
-    *pX = (int) pt.x - 2;
-    *pY = mGraphics->Height() - (int) pt.y - 3;
+      
+      //pt.x -= 1;
+      //pt.y -= 1;
+
+      if (mGraphics->GetPlug()->GetGUIResize() && mGraphics->IsUsingSystemGUIScaling())
+      {
+          double systemScaleRatio = mGraphics->GetSystemGUIScaleRatio();
+          
+          double x = pt.x * systemScaleRatio;
+          *pX = (int)ceil(x);
+          
+          double y = mGraphics->Height() - (pt.y * systemScaleRatio);
+          *pY =  int(y);
+      }
+      else
+      {
+        *pX = int(pt.x);
+          
+        *pY = mGraphics->Height() - (int) pt.y;
+      }
+
+      
     mPrevX = *pX;
     mPrevY = *pY;
   }
@@ -397,6 +429,33 @@ inline int GetMouseOver(IGraphicsMac* pGraphics)
   }
 }
 
+@synthesize trackingArea;
+
+- (void) updateTrackingAreas
+{
+    [super updateTrackingAreas];
+    if (trackingArea != nil)
+    {
+        [self removeTrackingArea:trackingArea];
+        [trackingArea release];
+    }
+    
+    int opts = (NSTrackingMouseEnteredAndExited | NSTrackingActiveAlways);
+    NSRect rect = [self bounds];
+
+    trackingArea = [ [NSTrackingArea alloc] initWithRect:rect
+                                                 options:opts
+                                                   owner:self
+                                                userInfo:nil];
+    [self addTrackingArea:trackingArea];
+}
+
+- (void) mouseExited:(NSEvent*) pEvent
+{ 
+    mGraphics->OnMouseOut();
+    [[NSCursor arrowCursor] set];
+}
+
 - (void)keyDown: (NSEvent *)pEvent
 {
   NSString *s = [pEvent charactersIgnoringModifiers];
@@ -487,6 +546,95 @@ inline int GetMouseOver(IGraphicsMac* pGraphics)
   [self endUserInput ];
   [self setNeedsDisplay: YES];
 }
+
+//#pragma clang diagnostic push
+//#pragma clang diagnostic ignored "-Wundeclared-selector"
+- (void) SetMouseCursor: (IGraphicsMac::ECursor) cursor
+{
+    NSCursor* cur = nullptr;
+    
+    switch (cursor)
+    {
+        case IGraphicsMac::ARROW:
+            [[NSCursor arrowCursor] set];
+            break;
+        case IGraphicsMac::IBEAM:
+            [[NSCursor IBeamCursor] set];
+            break;
+        case IGraphicsMac::WAIT:
+            if ([NSCursor respondsToSelector:@selector(_waitCursor)])
+                cur = [NSCursor performSelector:@selector(_waitCursor)];
+            else
+                cur = [NSCursor arrowCursor];
+            
+            [cur set];
+            break;
+        case IGraphicsMac::CROSS:
+            [[NSCursor crosshairCursor] set];
+            break;
+        case IGraphicsMac::UPARROW:
+            [[NSCursor resizeUpCursor] set];
+            break;
+        case IGraphicsMac::SIZENWSE:
+            if ([NSCursor respondsToSelector:@selector(_windowResizeNorthWestSouthEastCursor)])
+                cur = [NSCursor performSelector:@selector(_windowResizeNorthWestSouthEastCursor)];
+            else
+                cur = [NSCursor arrowCursor];
+            
+            [cur set];
+            break;
+        
+        case IGraphicsMac::SIZENESW:
+            if ([NSCursor respondsToSelector:@selector(_windowResizeNorthEastSouthWestCursor)])
+                cur = [NSCursor performSelector:@selector(_windowResizeNorthEastSouthWestCursor)];
+            else
+                cur = [NSCursor arrowCursor];
+            
+              [cur set];
+            break;
+        case IGraphicsMac::SIZEWE:
+            [[NSCursor resizeLeftRightCursor] set];
+            break;
+        case IGraphicsMac::SIZENS:
+            if ([NSCursor respondsToSelector:@selector(_windowResizeNorthSouthCursor)])
+                cur = [NSCursor performSelector:@selector(_windowResizeNorthSouthCursor)];
+            else
+                cur = [NSCursor arrowCursor];
+            
+            [cur set];
+            break;
+        case IGraphicsMac::SIZEALL:
+            if ([NSCursor respondsToSelector:@selector(_moveCursor)])
+                cur = [NSCursor performSelector:@selector(_moveCursor)];
+            else
+                cur = [NSCursor arrowCursor];
+            
+            [cur set];
+            break;
+        case IGraphicsMac::INO:
+            cur = [NSCursor performSelector:@selector(operationNotAllowedCursor)];
+            [cur set];
+            break;
+        case IGraphicsMac::HAND:
+            [[NSCursor pointingHandCursor] set];
+            break;
+        case IGraphicsMac::APPSTARTING:
+            [[NSCursor arrowCursor] set];
+            break;
+        case IGraphicsMac::HELP:
+            if ([NSCursor respondsToSelector:@selector(_helpCursor)])
+                cur = [NSCursor performSelector:@selector(_helpCursor)];
+            else
+                cur = [NSCursor arrowCursor];
+            
+            [cur set];
+            break;
+        default:
+            [[NSCursor arrowCursor] set];
+            break;
+    }
+}
+//#pragma clang diagnostic pop
 
 - (IPopupMenu*) createIPopupMenu: (IPopupMenu*) pMenu : (NSRect) rect;
 {

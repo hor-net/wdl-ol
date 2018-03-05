@@ -19,6 +19,7 @@ public:
 
   void Resize(int w, int h);
 
+  void SetMouseCursor(ECursor cursor);
   void HideMouseCursor();
   void ShowMouseCursor();
   int ShowMessageBox(const char* pText, const char* pCaption, int type);
@@ -28,6 +29,8 @@ public:
   void* OpenWindow(void* pParentWnd);
   void CloseWindow();
   bool WindowIsOpen() { return (mPlugWnd); }
+
+  double GetSystemGUIScaleRatio();
   
   void UpdateTooltips() {}
 

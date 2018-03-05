@@ -13,7 +13,26 @@ inline NSRect ToNSRect(IGraphics* pGraphics, IRECT* pR)
 inline IRECT ToIRECT(IGraphics* pGraphics, NSRect* pR)
 {
   int x = pR->origin.x, y = pR->origin.y, w = pR->size.width, h = pR->size.height, gh = pGraphics->Height();
-  return IRECT(x, gh - (y + h), x + w, gh - y);
+    IRECT outRECT;
+    
+    if (pGraphics->GetPlug()->GetGUIResize() && pGraphics->IsUsingSystemGUIScaling())
+    {
+        double systemScaleRatio = pGraphics->GetSystemGUIScaleRatio();
+        
+        outRECT = IRECT(x, gh / systemScaleRatio - (y + h), x + w, gh / systemScaleRatio - y);
+        
+        outRECT.L *= systemScaleRatio;
+        outRECT.T *= systemScaleRatio;
+        outRECT.R *= systemScaleRatio;
+        outRECT.B *= systemScaleRatio;
+        
+    }
+    else
+    {
+        outRECT = IRECT(x, gh - (y + h), x + w, gh - y);
+    }
+    
+    return outRECT;
 }
 
 inline NSColor* ToNSColor(IColor* pColor)
@@ -65,6 +84,8 @@ NSString* ToNSString(const char* cStr);
   IControl* mEdControl; // the control linked to the open text edit
   IParam* mEdParam; // the param linked to the open text edit (optional)
   int mPrevX, mPrevY;
+  NSTrackingArea *trackingArea;
+    
 @public
   IGraphicsMac* mGraphics;
 }
@@ -84,15 +105,20 @@ NSString* ToNSString(const char* cStr);
 - (void) rightMouseUp: (NSEvent*) pEvent;
 - (void) rightMouseDragged: (NSEvent*) pEvent;
 - (void) mouseMoved: (NSEvent*) pEvent;
+- (void) updateTrackingAreas;
+- (void) mouseExited:(NSEvent*) pEvent;
 - (void) scrollWheel: (NSEvent*) pEvent;
 - (void) keyDown: (NSEvent *)pEvent;
 - (void) killTimer;
 - (void) removeFromSuperview;
 //- (void) controlTextDidChange: (NSNotification *) aNotification;
+- (void) SetMouseCursor: (IGraphicsMac::ECursor) cursor;
 - (void) controlTextDidEndEditing: (NSNotification*) aNotification;
 - (IPopupMenu*) createIPopupMenu: (IPopupMenu*) pMenu : (NSRect) rect;
 - (void) createTextEntry: (IControl*) pControl : (IParam*) pParam : (IText*) pText : (const char*) pString : (NSRect) areaRect;
 - (void) endUserInput;
 - (NSString*) view: (NSView*) pView stringForToolTip: (NSToolTipTag) tag point: (NSPoint) point userData: (void*) pData;
 - (void) registerToolTip: (IRECT*) pRECT;
+
+@property (nonatomic, retain) NSTrackingArea *trackingArea;
 @end

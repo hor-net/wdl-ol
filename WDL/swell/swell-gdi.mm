@@ -1527,15 +1527,15 @@ HDC GetDC(HWND h)
       if (ret)
       {
         if ((ret)->ctx) CGContextSaveGState((ret)->ctx);
-        if ([(id)h isKindOfClass:[SWELL_hwndChild class]])
-        {
-          SWELL_hwndChild *view = (SWELL_hwndChild*)h;
-          if (!ret->GLgfxctx) 
-          {
-            ret->GLgfxctx = view->m_glctx;
-            if (view->m_glctx) [view->m_glctx setView:view];
-          }
-        }
+        //if ([(id)h isKindOfClass:[SWELL_hwndChild class]])
+        //{
+        //  SWELL_hwndChild *view = (SWELL_hwndChild*)h;
+        //  if (!ret->GLgfxctx)
+        //  {
+        //    ret->GLgfxctx = view->m_glctx;
+        //    if (view->m_glctx) [view->m_glctx setView:view];
+        //  }
+        //}
       }
       return ret;
     }
