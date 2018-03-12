@@ -1808,7 +1808,7 @@ OSStatus IPlugAU::RenderProc(void* pPlug, AudioUnitRenderActionFlags* pFlags, co
     {
       IMidiMsg* pMsg = _this->mMidiOutputQueue.Peek();
       
-      packet = MIDIPacketListAdd( &packetList, sizeof(packetList), packet, pMsg->mOffset /* correct timestamp? */, 3, (const Byte *) &pMsg->mStatus );
+      packet = MIDIPacketListAdd( &packetList, 2048, packet, pMsg->mOffset /* correct timestamp? */, 3, (const Byte *) &pMsg->mStatus );
 
       _this->mMidiOutputQueue.Remove();
     }

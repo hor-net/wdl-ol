@@ -113,9 +113,9 @@ resource 'dlle' (RES_ID) {
 resource 'thng' (RES_ID, RES_NAME) {
 #if PLUG_IS_INST
 kAudioUnitType_MusicDevice,
-#elif AU_MIDI_FX
+#elif defined PLUG_DOES_MIDI && defined AU_MIDI_FX
 'aumi',
-#elif PLUG_DOES_MIDI
+#elif defined PLUG_DOES_MIDI && !defined AU_MIDI_FX
 kAudioUnitType_MusicEffect,
 #else
 kAudioUnitType_Effect,
