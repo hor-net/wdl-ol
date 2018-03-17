@@ -853,8 +853,8 @@ bool IGraphicsMac::PromptForColor(IColor* pColor, char* prompt)
 	//[colorPanel setAction:@selector(colorPanelAction:)];
 	//[NSApp orderFrontColorPanel:self];
 	
-	RGBColor inColor = {pColor->R * 256, pColor->G * 256, pColor->B * 256};
-	RGBColor outColor = {pColor->R * 256, pColor->G * 256, pColor->B * 256};
+	RGBColor inColor = {static_cast<unsigned short>(pColor->R * 256), static_cast<unsigned short>(pColor->G * 256), static_cast<unsigned short>(pColor->B * 256)};
+	RGBColor outColor = {static_cast<unsigned short>(pColor->R * 256), static_cast<unsigned short>(pColor->G * 256), static_cast<unsigned short>(pColor->B * 256)};
 	Point point = {0, 0};
 	if (GetColor(point, (ConstStr255Param)prompt, &inColor, &outColor)) {
 		//NSColor *color = [NSColor colorWithCalibratedRed:(float)outColor.red / (float)UINT16_MAX green:(float)outColor.green / (float)UINT16_MAX blue:(float)outColor.blue / (float)UINT16_MAX alpha:1.0];
