@@ -16,7 +16,6 @@
     <ClCompile Include="IPlugGUILiveEdit.cpp" />
     <ClCompile Include="IControlGroup.cpp" />
     <ClCompile Include="IPlugConfigFile.cpp" />
-    <ClCompile Include="IPlugFileSystem.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Containers.h" />
