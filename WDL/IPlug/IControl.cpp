@@ -50,7 +50,10 @@ void IControl::SetDirty(bool pushParamToPlug)
     {
       ((ITextControl*)mNameDisplayControl)->SetTextFromPlug((char*) pParam->GetNameForHost());
     }
-  }
+	}
+	if(mParamIdx >= 0){
+		mPlug->GetGUI()->SetParameterFromPlug(mParamIdx, mValue, true);
+	}
 }
 
 void IControl::SetClean()
