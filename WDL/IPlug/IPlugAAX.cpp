@@ -136,7 +136,7 @@ IPlugAAX::IPlugAAX(IPlugInstanceInfo instanceInfo,
   }
 	
   SetBlockSize(DEFAULT_BLOCK_SIZE);
-  SetHost("ProTools", vendorVersion); // TODO:vendor version correct?  
+	SetHost("ProTools", vendorVersion); // TODO:vendor version correct?
 }
 
 IPlugAAX::~IPlugAAX()
@@ -343,7 +343,7 @@ void IPlugAAX::RenderAudio(AAX_SIPlugRenderInfo* ioRenderInfo)
 	SetInputChannelConnections(0, numInChannels, true);
 #endif
 	printf("attach input buffers: 0 - %d\n", NInChannels());
-	AttachInputBuffers(0, NInChannels(), ioRenderInfo->mAudioInputs, numSamples);
+	AttachInputBuffers(0, numInChannels, ioRenderInfo->mAudioInputs, numSamples);
 	
 	 //AttachInputBuffers(numInChannels, NInChannels() - numInChannels, ioRenderInfo->mAudioInputs, numSamples);
 	
@@ -355,7 +355,13 @@ void IPlugAAX::RenderAudio(AAX_SIPlugRenderInfo* ioRenderInfo)
   SetOutputChannelConnections(numOutChannels, NOutChannels() - numOutChannels, false);
   
   AttachOutputBuffers(0, NOutChannels(), ioRenderInfo->mAudioOutputs);
-  
+	
+	// make sure that we initialize the plugin with the correct block size
+	if(GetBlockSize() != numSamples) {
+		SetBlockSize(numSamples);
+		Reset();
+	}
+	
   if (bypass) 
   {
     PassThroughBuffers(0.0f, numSamples);
