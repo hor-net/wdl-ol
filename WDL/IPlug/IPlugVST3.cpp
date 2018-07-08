@@ -681,27 +681,33 @@ tresult PLUGIN_API IPlugVST3::setEditorState(IBStream* state)
 	WDL_MutexLock lock(&mMutex);
 	
 	ByteChunk chunk;
-	SerializeState(&chunk); // to get the size
 	
-	if (chunk.Size() > 0)
+	const int bytesPerBlock = 128;
+	char buffer[bytesPerBlock];
+	
+	for (;;)
 	{
-		state->read(chunk.GetBytes(), chunk.Size());
-		UnserializeState(&chunk, 0);
+		Steinberg::int32 bytesRead = 0;
+		auto status = state->read (buffer, (Steinberg::int32) bytesPerBlock, &bytesRead);
 		
-		int32 savedBypass = 0;
+		if (bytesRead <= 0 || status != kResultTrue)
+			break;
 		
-		if (state->read (&savedBypass, sizeof (int32)) != kResultOk)
-		{
-			return kResultFalse;
-		}
-		
-		mIsBypassed = (bool) savedBypass;
-		
-		RedrawParamControls();
-		return kResultOk;
+		chunk.PutBytes(buffer, bytesRead);
 	}
+	UnserializeState(&chunk,0);
 	
-	return kResultFalse;
+	int32 savedBypass = 0;
+		
+	if (state->read (&savedBypass, sizeof (int32)) != kResultOk) {
+		return kResultFalse;
+	}
+		
+	mIsBypassed = (bool) savedBypass;
+	
+	RedrawParamControls();
+	return kResultOk;
+	
 }
 
 tresult PLUGIN_API IPlugVST3::getEditorState(IBStream* state)
