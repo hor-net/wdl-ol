@@ -134,24 +134,24 @@ IPlugGUIResize::IPlugGUIResize(IPlugBase* pPlug, IGraphics* pGraphics, bool useH
 	plugin_height = pGraphics->Height();
 
 	// Set settings.ini file path
-	pGraphics->DocumentsPath(&settings_ini_path);
-	settings_ini_path.Append("/");
-	settings_ini_path.Append(pPlug->GetMfrName());
+	//pGraphics->DocumentsPath(&settings_ini_path);
+	//settings_ini_path.Append("/");
+	//settings_ini_path.Append(pPlug->GetMfrName());
 
 	// Create directory if it doesn't exist
-	fileSystem.DirCreate(settings_ini_path.Get());
+	//fileSystem.DirCreate(settings_ini_path.Get());
 
-	settings_ini_path.Append("/");
-	settings_ini_path.Append(pPlug->GetEffectName());
+	//settings_ini_path.Append("/");
+	//settings_ini_path.Append(pPlug->GetEffectName());
 
 	// Create directory if it doesn't exist
-	fileSystem.DirCreate(settings_ini_path.Get());
+	//fileSystem.DirCreate(settings_ini_path.Get());
 
-	settings_ini_path.Append("/Settings.ini");
+	//settings_ini_path.Append("/Settings.ini");
 
-	gui_scale_ratio = GetDoubleFromFile("guiscale");
+	//gui_scale_ratio = GetDoubleFromFile("guiscale");
 
-	if (gui_scale_ratio < 0.0)
+	/*if (gui_scale_ratio < 0.0)
 	{
 		SetDoubleToFile("guiscale", 1.0);
 		gui_scale_ratio = 1.0;
@@ -159,7 +159,9 @@ IPlugGUIResize::IPlugGUIResize(IPlugBase* pPlug, IGraphics* pGraphics, bool useH
 	else
 	{
 		gui_scale_ratio = GetDoubleFromFile("guiscale");
-	}
+	}*/
+	 
+	gui_scale_ratio  = 1.;
 
 	// Initialize parameters
 	guiResizeParameters.Add(new IParam);
@@ -1391,7 +1393,8 @@ void IPlugGUIResize::ResizeAtGUIOpen()
 		presets_loaded = true;
 	}
 
-	gui_scale_ratio = GetDoubleFromFile("guiscale");
+	//gui_scale_ratio = GetDoubleFromFile("guiscale");
+	gui_scale_ratio = 1.;
 
 	if (mGraphics->IsUsingSystemGUIScaling()) gui_scale_ratio *= mGraphics->GetSystemGUIScaleRatio();
 
@@ -1432,14 +1435,15 @@ void IPlugGUIResize::ResizeGraphics()
 
 	if (mGraphics->IsUsingSystemGUIScaling()) gui_scale_ratio /= mGraphics->GetSystemGUIScaleRatio();
 
-	if (double_equals(GetDoubleFromFile("guiscale"), gui_scale_ratio))
+	/*if (double_equals(GetDoubleFromFile("guiscale"), gui_scale_ratio))
 	{
 		window_resizing = true;
 	}
 	else
 	{
 		SetDoubleToFile("guiscale", gui_scale_ratio);
-	}
+	}*/
+	//window_resizing = true;
 
 	if (mGraphics->IsUsingSystemGUIScaling()) gui_scale_ratio *= mGraphics->GetSystemGUIScaleRatio();
 
