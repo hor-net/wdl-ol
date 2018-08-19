@@ -718,15 +718,16 @@ tresult PLUGIN_API IPlugVST3::setEditorState(IBStream* state)
 		Steinberg::int32 bytesRead = 0;
 		auto status = state->read (buffer, (Steinberg::int32) bytesPerBlock, &bytesRead);
 		
-		if (bytesRead <= 0 || status != kResultTrue)
+		if (bytesRead <= 0 || (status != kResultTrue && GetHost() != kHostWaveLab))
 			break;
 		
 		chunk.PutBytes(buffer, bytesRead);
 	}
-	UnserializeState(&chunk,0);
+	int pos = UnserializeState(&chunk,0);
 	
 	int32 savedBypass = 0;
-		
+	
+	state->seek(pos,IBStream::IStreamSeekMode::kIBSeekSet);
 	if (state->read (&savedBypass, sizeof (int32)) != kResultOk) {
 		return kResultFalse;
 	}
