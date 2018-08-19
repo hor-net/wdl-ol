@@ -52,9 +52,9 @@ public:
 	tresult PLUGIN_API setActive(TBool state);
 	tresult PLUGIN_API setupProcessing (ProcessSetup& newSetup);
 	tresult PLUGIN_API process(ProcessData& data);
-	//  tresult PLUGIN_API setState(IBStream* state);
-	//  tresult PLUGIN_API getState(IBStream* state);
-	//  tresult PLUGIN_API setComponentState(IBStream *state);
+	tresult PLUGIN_API setState(IBStream* state);
+	tresult PLUGIN_API getState(IBStream* state);
+	tresult PLUGIN_API setComponentState(IBStream *state);
 	tresult PLUGIN_API canProcessSampleSize(int32 symbolicSampleSize);
 	Steinberg::uint32 PLUGIN_API getLatencySamples ();
 	Steinberg::uint32 PLUGIN_API getTailSamples() { return GetTailSize(); }
