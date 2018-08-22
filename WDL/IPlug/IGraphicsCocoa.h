@@ -86,6 +86,7 @@ NSString* ToNSString(const char* cStr);
   int mPrevX, mPrevY;
   NSTrackingArea *trackingArea;
     
+  IColor* mColorPickerColor;
 @public
   IGraphicsMac* mGraphics;
 }
@@ -119,6 +120,8 @@ NSString* ToNSString(const char* cStr);
 - (void) endUserInput;
 - (NSString*) view: (NSView*) pView stringForToolTip: (NSToolTipTag) tag point: (NSPoint) point userData: (void*) pData;
 - (void) registerToolTip: (IRECT*) pRECT;
+- (bool) PromptForColor: (IColor*) pColor;
+- (void) ColorUpdate: (NSColorPanel*) cp;
 
 @property (nonatomic, retain) NSTrackingArea *trackingArea;
 @end

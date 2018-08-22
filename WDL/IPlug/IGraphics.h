@@ -267,15 +267,16 @@ public:
 
 	WDL_Mutex mMutex;
 
-	struct IMutexLock
-	{
-		WDL_Mutex* mpMutex;
-		IMutexLock(IGraphics* pGraphics) : mpMutex(&(pGraphics->mMutex)) { mpMutex->Enter(); }
-		~IMutexLock() { mpMutex->Leave(); }
-	};
+  struct IMutexLock
+  {
+    WDL_Mutex* mpMutex;
+    IMutexLock(IGraphics* pGraphics) : mpMutex(&(pGraphics->mMutex)) { mpMutex->Enter(); }
+    ~IMutexLock() { mpMutex->Leave(); }
+  };
+	
+  IColor mColorPickerColor;
 
 protected:
-
 	WDL_PtrList<IControl> mControls;
 	WDL_PtrList<IControlGroup> mControlGroups;
 	IPlugBase* mPlug;
