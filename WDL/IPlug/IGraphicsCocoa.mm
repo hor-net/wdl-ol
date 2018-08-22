@@ -462,6 +462,8 @@ inline int GetMouseOver(IGraphicsMac* pGraphics)
 {
   if (mTextFieldView) [self endUserInput ];
 
+  [[NSColorPanel sharedColorPanel] close];
+	
   if (mGraphics)
   {
     IGraphics* graphics = mGraphics;
@@ -632,6 +634,30 @@ inline int GetMouseOver(IGraphicsMac* pGraphics)
 - (void) registerToolTip: (IRECT*) pRECT
 {
   [self addToolTipRect: ToNSRect(mGraphics, pRECT) owner: self userData: nil];
+}
+
+- (bool) PromptForColor: (IColor*) pColor;
+{
+	NSColor *color = [NSColor colorWithCalibratedRed:(float)pColor->R / 255.
+											   green:(float)pColor->G / 255.
+												blue:(float)pColor->B / 255.
+											   alpha:1.0];
+	
+	NSColorPanel *cp = [NSColorPanel sharedColorPanel];
+	[cp orderFront:nil];
+	[cp setTarget:self];
+	[cp setColor:color];
+	[cp setAction:@selector(ColorUpdate:)];
+	
+	return true;
+}
+
+- (void) ColorUpdate: (NSColorPanel*)cp;
+{
+	NSColor* outColor = cp.color;
+	mGraphics->mColorPickerColor.R = outColor.redComponent * 255;
+	mGraphics->mColorPickerColor.G = outColor.greenComponent * 255;
+	mGraphics->mColorPickerColor.B = outColor.blueComponent * 255;
 }
 
 @end

@@ -1208,9 +1208,12 @@ bool IGraphicsWin::PromptForColor(IColor* pColor, char* prompt)
 
   if (ChooseColor(&cc))
   {
-    pColor->R = GetRValue(cc.rgbResult);
-    pColor->G = GetGValue(cc.rgbResult);
-    pColor->B = GetBValue(cc.rgbResult);
+	mColorPickerColor.R = GetRValue(cc.rgbResult);
+	mColorPickerColor.G = GetGValue(cc.rgbResult);
+	mColorPickerColor.B = GetBValue(cc.rgbResult);
+	//mColorPickerColor.R = pColor->R;
+	//mColorPickerColor.G = pColor->G;
+	//mColorPickerColor.B = pColor->B;
     return true;
   }
   return false;

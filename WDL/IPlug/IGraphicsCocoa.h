@@ -65,6 +65,7 @@ NSString* ToNSString(const char* cStr);
   IControl* mEdControl; // the control linked to the open text edit
   IParam* mEdParam; // the param linked to the open text edit (optional)
   int mPrevX, mPrevY;
+  IColor* mColorPickerColor;
 @public
   IGraphicsMac* mGraphics;
 }
@@ -95,4 +96,6 @@ NSString* ToNSString(const char* cStr);
 - (void) endUserInput;
 - (NSString*) view: (NSView*) pView stringForToolTip: (NSToolTipTag) tag point: (NSPoint) point userData: (void*) pData;
 - (void) registerToolTip: (IRECT*) pRECT;
+- (bool) PromptForColor: (IColor*) pColor;
+- (void) ColorUpdate: (NSColorPanel*) cp;
 @end

@@ -847,23 +847,48 @@ void IGraphicsMac::PromptForFile(WDL_String* pFilename, EFileAction action, WDL_
 
 bool IGraphicsMac::PromptForColor(IColor* pColor, char* prompt)
 {
+	
+	if (mGraphicsCocoa)
+	{
+		return [(IGRAPHICS_COCOA*) mGraphicsCocoa PromptForColor: pColor];
+	}
+#ifndef IPLUG_NO_CARBON_SUPPORT
+	else if (mGraphicsCarbon)
+	{
+		RGBColor inColor = {static_cast<unsigned short>(pColor->R * 256), static_cast<unsigned short>(pColor->G * 256), static_cast<unsigned short>(pColor->B * 256)};
+		RGBColor outColor = {static_cast<unsigned short>(pColor->R * 256), static_cast<unsigned short>(pColor->G * 256), static_cast<unsigned short>(pColor->B * 256)};
+		Point point = {0, 0};
+		if (GetColor(point, (ConstStr255Param)prompt, &inColor, &outColor)) {
+			NSColor *color = [NSColor colorWithCalibratedRed:(float)outColor.red / (float)UINT16_MAX green:(float)outColor.green / (float)UINT16_MAX blue:(float)outColor.blue / (float)UINT16_MAX alpha:1.0];
+			pColor->R = outColor.red / 256;
+			pColor->G = outColor.green / 256;
+			pColor->B = outColor.blue / 256;
+			mColorPickerColor.R = pColor->R;
+			mColorPickerColor.G = pColor->G;
+			mColorPickerColor.B = pColor->B;
+			return true;
+		}
+	}
+#endif
+	else return 0;
+	
   //NSColorPanel *colorPanel = [NSColorPanel sharedColorPanel];
 	//NSModalSession session = [NSApp beginModalSessionForWindow:colorPanel];
 	//[colorPanel setTarget:self]; // target??
 	//[colorPanel setAction:@selector(colorPanelAction:)];
 	//[NSApp orderFrontColorPanel:self];
 	
-	RGBColor inColor = {static_cast<unsigned short>(pColor->R * 256), static_cast<unsigned short>(pColor->G * 256), static_cast<unsigned short>(pColor->B * 256)};
-	RGBColor outColor = {static_cast<unsigned short>(pColor->R * 256), static_cast<unsigned short>(pColor->G * 256), static_cast<unsigned short>(pColor->B * 256)};
-	Point point = {0, 0};
-	if (GetColor(point, (ConstStr255Param)prompt, &inColor, &outColor)) {
+	//RGBColor inColor = {static_cast<unsigned short>(pColor->R * 256), static_cast<unsigned short>(pColor->G * 256), static_cast<unsigned short>(pColor->B * 256)};
+	//RGBColor outColor = {static_cast<unsigned short>(pColor->R * 256), static_cast<unsigned short>(pColor->G * 256), static_cast<unsigned short>(pColor->B * 256)};
+	//Point point = {0, 0};
+	//if (GetColor(point, (ConstStr255Param)prompt, &inColor, &outColor)) {
 		//NSColor *color = [NSColor colorWithCalibratedRed:(float)outColor.red / (float)UINT16_MAX green:(float)outColor.green / (float)UINT16_MAX blue:(float)outColor.blue / (float)UINT16_MAX alpha:1.0];
 		//[colorWell setColor:color];
-		pColor->R = outColor.red / 256;
-		pColor->G = outColor.green / 256;
-		pColor->B = outColor.blue / 256;
+	//	pColor->R = outColor.red / 256;
+	//	pColor->G = outColor.green / 256;
+	//	pColor->B = outColor.blue / 256;
 		//return true;
-	} //else {
+	//} //else {
 		//return false;
 	//}
 	//[NSApp endModalSession:session];

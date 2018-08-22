@@ -254,6 +254,8 @@ public:
     IMutexLock(IGraphics* pGraphics) : mpMutex(&(pGraphics->mMutex)) { mpMutex->Enter(); }
     ~IMutexLock() { mpMutex->Leave(); }
   };
+	
+  IColor mColorPickerColor;
 
 protected:
   WDL_PtrList<IControl> mControls;
