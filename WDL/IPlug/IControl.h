@@ -15,6 +15,8 @@
 
 #define DEFAULT_TEXT_ENTRY_LEN 7
 
+const float GRAYED_ALPHA = 0.25f;
+
 class IControl
 {
 public:
