@@ -1655,6 +1655,10 @@ OSStatus IPlugAU::RenderProc(void* pPlug, AudioUnitRenderActionFlags* pFlags, co
           return r;   // Something went wrong upstream.
         }
 
+				// make sure that unused inputs are connected to scratch buf (in DP9
+				// they are unconnected for mono tracks)
+				_this->SetInputChannelConnections(0, _this->NInChannels(), false);
+				_this->SetInputChannelConnections(pInBus->mPlugChannelStartIdx, pInBus->mNHostChannels, true);
         for (int i = 0, chIdx = pInBus->mPlugChannelStartIdx; i < pInBus->mNHostChannels; ++i, ++chIdx)
         {
           _this->AttachInputBuffers(chIdx, 1, (AudioSampleType**) &(pInBufList->mBuffers[i].mData), nFrames);
