@@ -1351,7 +1351,7 @@ bool IGraphics::OnMouseOver(int x, int y, IMouseMod* pMod)
 	if (mHandleMouseOver)
 	{
 		int c = GetMouseControlIdx(x, y, true);
-		if (c >= 0)
+		if (c >= 0 && !mControls.Get(c)->IsHidden())
 		{
 			mMouseX = x;
 			mMouseY = y;
