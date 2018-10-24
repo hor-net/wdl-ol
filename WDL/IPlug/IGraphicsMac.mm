@@ -968,3 +968,18 @@ bool IGraphicsMac::GetTextFromClipboard(WDL_String* pStr)
     }
 }
 
+void IGraphicsMac::SetWindowTransparency(int alpha)
+{
+#ifndef IPLUG_NO_CARBON_SUPPORT
+	if (mGraphicsCarbon)
+	{
+		mGraphicsCarbon->SetWindowTransparency(alpha);
+	}
+	else
+#endif
+		if (mGraphicsCocoa)
+		{
+			[(IGRAPHICS_COCOA*) mGraphicsCocoa SetWindowTransparency:alpha];
+		}
+}
+

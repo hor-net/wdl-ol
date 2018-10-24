@@ -125,6 +125,8 @@ public:
     
     
     double GetSystemGUIScaleRatio();
+	
+	void SetWindowTransparency(int alpha);
     
 protected:
     virtual LICE_IBitmap* OSLoadBitmap(int ID, const char* name);

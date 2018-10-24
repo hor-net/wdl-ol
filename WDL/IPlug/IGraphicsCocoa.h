@@ -122,6 +122,7 @@ NSString* ToNSString(const char* cStr);
 - (void) registerToolTip: (IRECT*) pRECT;
 - (bool) PromptForColor: (IColor*) pColor;
 - (void) ColorUpdate: (NSColorPanel*) cp;
+- (void) SetWindowTransparency: (int) _mAlpha;
 
 @property (nonatomic, retain) NSTrackingArea *trackingArea;
 @end

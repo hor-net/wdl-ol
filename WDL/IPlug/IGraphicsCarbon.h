@@ -35,6 +35,8 @@ public:
   void CreateTextEntry(IControl* pControl, IText* pText, IRECT* pTextRect, const char* pString, IParam* pParam);
 
   void EndUserInput(bool commit);
+	
+	void SetWindowTransparency(int alpha);
   
 protected:
   void ShowTooltip();

@@ -1257,4 +1257,9 @@ void IGraphicsCarbon::HideTooltip()
   }
 }
 
+void IGraphicsCarbon::SetWindowTransparency(int alpha)
+{
+	return;
+}
+
 #endif // IPLUG_NO_CARBON_SUPPORT

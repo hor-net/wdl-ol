@@ -808,4 +808,12 @@ inline int GetMouseOver(IGraphicsMac* pGraphics)
 	mGraphics->mColorPickerColor.B = outColor.blueComponent * 255;
 }
 
+- (void) SetWindowTransparency: (int) _mAlpha
+{
+	NSWindow* pWindow = [self window];
+	CGFloat opacity = _mAlpha / 255.0f;
+	[pWindow setAlphaValue:opacity];
+	[pWindow setOpaque:NO];
+}
+
 @end

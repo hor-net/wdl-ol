@@ -137,6 +137,8 @@ public:
 	virtual void* GetWindow() = 0;
 
 	virtual bool GetTextFromClipboard(WDL_String* pStr) = 0;
+	
+	virtual void SetWindowTransparency(int alpha) = 0;
 
 	////////////////////////////////////////
 

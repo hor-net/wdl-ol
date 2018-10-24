@@ -1426,3 +1426,12 @@ bool IGraphicsWin::GetTextFromClipboard(WDL_String* pStr)
   return success;
 }
 
+void IGraphicsWin::SetWindowTransparency(int alpha)
+{
+	if(mParentWnd)
+	{
+		SetWindowLong(mParentWnd, GWL_EXSTYLE, GetWindowLong(mParentWnd, GWL_EXSTYLE) | WS_EX_LAYERED);
+		SetLayeredWindowAttributes(mParentWnd, 0, (BYTE)alpha, LWA_ALPHA);
+	}
+}
+
