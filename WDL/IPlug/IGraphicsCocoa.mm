@@ -278,6 +278,10 @@ inline int GetMouseOver(IGraphicsMac* pGraphics)
 
 - (void) drawRect: (NSRect) rect
 {
+	NSWindow* pWindow = [self window];
+	[pWindow setOpaque:NO];
+	[[NSColor clearColor] set];
+	NSRectFill(rect);
   if (mGraphics)
   {
     IRECT tmpRect = ToIRECT(mGraphics, &rect);
