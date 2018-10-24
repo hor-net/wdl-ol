@@ -181,6 +181,7 @@
       <PreprocessorDefinitions>NDEBUG;GLEW_STATIC;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <AdditionalIncludeDirectories>..\..\YCAIRO\Cairo_Graphics\projects\cairo\src\;..\..\YCAIRO;..\..\YCAIRO\Cairo_Graphics\cairo\src\;..\..\YCAIRO\Cairo_Graphics\freetype\include\;..\..\YCAIRO\Cairo_Graphics\glew\include\;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <WholeProgramOptimization>false</WholeProgramOptimization>
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
@@ -200,6 +201,7 @@
       <PreprocessorDefinitions>NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <AdditionalIncludeDirectories>..\..\YCAIRO\Cairo_Graphics\projects\cairo\src\;..\..\YCAIRO;..\..\YCAIRO\Cairo_Graphics\cairo\src\;..\..\YCAIRO\Cairo_Graphics\freetype\include\;D:\IPlug-Youlean\YCAIRO\Cairo_Graphics\glew\include\;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <WholeProgramOptimization>false</WholeProgramOptimization>
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
