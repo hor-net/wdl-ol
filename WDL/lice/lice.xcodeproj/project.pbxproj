@@ -596,7 +596,7 @@
 				);
 				MACOSX_DEPLOYMENT_TARGET = 10.7;
 				PRODUCT_NAME = lice;
-				SDKROOT = macosx10.12;
+				SDKROOT = macosx;
 				SKIP_INSTALL = YES;
 				SYMROOT = "build-mac";
 			};
@@ -623,7 +623,7 @@
 				);
 				MACOSX_DEPLOYMENT_TARGET = 10.7;
 				PRODUCT_NAME = lice;
-				SDKROOT = macosx10.12;
+				SDKROOT = macosx;
 				SKIP_INSTALL = YES;
 				STRIP_INSTALLED_PRODUCT = YES;
 				STRIP_STYLE = "non-global";
