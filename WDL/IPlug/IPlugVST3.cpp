@@ -710,15 +710,16 @@ tresult PLUGIN_API IPlugVST3::setEditorState(IBStream* state)
 	
 	ByteChunk chunk;
 	
-	const int bytesPerBlock = 128;
+	const int bytesPerBlock = 1024;
 	char buffer[bytesPerBlock];
 	
+
 	for (;;)
 	{
 		Steinberg::int32 bytesRead = 0;
-		auto status = state->read (buffer, (Steinberg::int32) bytesPerBlock, &bytesRead);
+		state->read (buffer, (Steinberg::int32) bytesPerBlock, &bytesRead);
 		
-		if (bytesRead <= 0 || status != kResultTrue)
+		if (bytesRead <= 0)
 			break;
 		
 		chunk.PutBytes(buffer, bytesRead);
@@ -726,7 +727,7 @@ tresult PLUGIN_API IPlugVST3::setEditorState(IBStream* state)
 	UnserializeState(&chunk,0);
 	
 	int32 savedBypass = 0;
-		
+	state->seek(chunk.Size() - sizeof(int32), IBStream::IStreamSeekMode::kIBSeekSet);
 	if (state->read (&savedBypass, sizeof (int32)) != kResultOk) {
 		return kResultFalse;
 	}
