@@ -366,7 +366,8 @@ tresult PLUGIN_API IPlugVST3::process(ProcessData& data)
   IMutexLock lock(this);
 
   if(data.processContext)
-    memcpy(&mProcessContext, data.processContext, sizeof(ProcessContext));
+  //  memcpy(&mProcessContext, data.processContext, sizeof(ProcessContext));
+		mProcessContext = data.processContext;
 
   //process parameters
   IParameterChanges* paramChanges = data.inputParameterChanges;
@@ -998,32 +999,32 @@ void IPlugVST3::EndInformHostOfParamChange(int idx)
 void IPlugVST3::GetTime(ITimeInfo* pTimeInfo)
 {
 	//TODO: check these are all valid
-	pTimeInfo->mSamplePos = (double) mProcessContext.projectTimeSamples;
-	pTimeInfo->mPPQPos = mProcessContext.projectTimeMusic;
-	pTimeInfo->mTempo = mProcessContext.tempo;
-	pTimeInfo->mLastBar = mProcessContext.barPositionMusic;
-	pTimeInfo->mCycleStart = mProcessContext.cycleStartMusic;
-	pTimeInfo->mCycleEnd = mProcessContext.cycleEndMusic;
-	pTimeInfo->mNumerator = mProcessContext.timeSigNumerator;
-	pTimeInfo->mDenominator = mProcessContext.timeSigDenominator;
-	pTimeInfo->mTransportIsRunning = mProcessContext.state & ProcessContext::kPlaying;
-	pTimeInfo->mTransportLoopEnabled = mProcessContext.state & ProcessContext::kCycleActive;
+	pTimeInfo->mSamplePos = (double) mProcessContext->projectTimeSamples;
+	pTimeInfo->mPPQPos = mProcessContext->projectTimeMusic;
+	pTimeInfo->mTempo = mProcessContext->tempo;
+	pTimeInfo->mLastBar = mProcessContext->barPositionMusic;
+	pTimeInfo->mCycleStart = mProcessContext->cycleStartMusic;
+	pTimeInfo->mCycleEnd = mProcessContext->cycleEndMusic;
+	pTimeInfo->mNumerator = mProcessContext->timeSigNumerator;
+	pTimeInfo->mDenominator = mProcessContext->timeSigDenominator;
+	pTimeInfo->mTransportIsRunning = mProcessContext->state & ProcessContext::kPlaying;
+	pTimeInfo->mTransportLoopEnabled = mProcessContext->state & ProcessContext::kCycleActive;
 }
 
 double IPlugVST3::GetTempo()
 {
-	return mProcessContext.tempo;
+	return mProcessContext->tempo;
 }
 
 void IPlugVST3::GetTimeSig(int* pNum, int* pDenom)
 {
-	*pNum = mProcessContext.timeSigNumerator;
-	*pDenom = mProcessContext.timeSigDenominator;
+	*pNum = mProcessContext->timeSigNumerator;
+	*pDenom = mProcessContext->timeSigDenominator;
 }
 
 int IPlugVST3::GetSamplePos()
 {
-	return (int) mProcessContext.projectTimeSamples;
+	return (int) mProcessContext->projectTimeSamples;
 }
 
 void IPlugVST3::ResizeGraphics(int w, int h)

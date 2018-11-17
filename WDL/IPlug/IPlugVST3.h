@@ -149,7 +149,7 @@ private:
 	int mScChans;
 	bool mSidechainActive;
 	//  IMidiQueue mMidiOutputQueue;
-	ProcessContext mProcessContext;
+	ProcessContext *mProcessContext;
 	TArray <IPlugVST3View*> viewsArray;
 	
 	friend class IPlugVST3View;
