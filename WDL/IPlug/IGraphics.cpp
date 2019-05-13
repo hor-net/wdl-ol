@@ -1336,6 +1336,7 @@ int IGraphics::GetLastClickedParamForPTAutomation()
 
 void IGraphics::OnGUIIdle()
 {
+  mPlug->OnIdle();
   int i, n = mControls.GetSize();
   IControl** ppControl = mControls.GetList();
   for (i = 0; i < n; ++i, ++ppControl)

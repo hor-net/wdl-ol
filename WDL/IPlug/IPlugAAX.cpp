@@ -214,15 +214,23 @@ AAX_Result IPlugAAX::EffectInit()
           displayTexts.insert(std::pair<int, AAX_CString>(value, AAX_CString(text)) );
         }
         
-        param = new AAX_CParameter<int>(paramID->Get(), 
-                                        AAX_CString(p->GetNameForHost()), 
-                                        (int)p->GetDefault(), 
-                                        AAX_CLinearTaperDelegate<int>((int)p->GetMin(), (int)p->GetMax()), 
-                                        AAX_CStringDisplayDelegate<int>(displayTexts),
-                                        p->GetCanAutomate());
+        //param = new AAX_CParameter<int>(paramID->Get(),
+        //                                AAX_CString(p->GetNameForHost()),
+        //                                (int)p->GetDefault(),
+        //                                AAX_CLinearTaperDelegate<int>((int)p->GetMin(), (int)p->GetMax()),
+        //                                AAX_CStringDisplayDelegate<int>(displayTexts),
+        //                                p->GetCanAutomate());
+        
+        param = new AAX_CParameter<double>(paramID->Get(),
+                                           AAX_CString(p->GetNameForHost()),
+                                           p->GetDefault(),
+                                           AAX_CIPlugTaperDelegate<double>(p->GetMin(), p->GetMax(), p->GetShape()),
+                                           AAX_CUnitDisplayDelegateDecorator<double>( AAX_CNumberDisplayDelegate<double>(), AAX_CString(p->GetLabelForHost())),
+                                           p->GetCanAutomate());
         
         param->SetNumberOfSteps(nTexts);
-        param->SetType(AAX_eParameterType_Discrete);
+        //param->SetType(AAX_eParameterType_Discrete);
+        param->SetType(AAX_eParameterType_Continuous);
                 
         break; 
       }

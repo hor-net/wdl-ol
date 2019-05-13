@@ -232,7 +232,7 @@ public:
 
 	// This is an idle call from the GUI thread, as opposed to 
 	// IPlug::OnIdle which is called from the audio processing thread.
-	void OnGUIIdle();
+	virtual void OnGUIIdle();
 
   void RetainBitmap(IBitmap* pBitmap);
   void ReleaseBitmap(IBitmap* pBitmap);
