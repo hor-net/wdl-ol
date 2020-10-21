@@ -47,6 +47,8 @@ inline IMouseMod GetMouseMod(WPARAM wParam)
                    );
 }
 
+extern int GetScaleForHWND(HWND hWnd);
+
 // static
 LRESULT CALLBACK IGraphicsWin::WndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 {
@@ -625,7 +627,12 @@ bool IGraphicsWin::DrawScreen(IRECT* pR)
   PAINTSTRUCT ps;
   HWND hWnd = (HWND) GetWindow();
   HDC dc = BeginPaint(hWnd, &ps);
+  //int scale = GetScaleForHWND(hWnd);
+  //LICE_SysBitmap* scaledView = new LICE_SysBitmap(pR->W() * scale, pR->H() * scale);
+  //_LICE::LICE_ScaledBlit(scaledView, mDrawBitmap, pR->L, pR->T, scaledView->getWidth(), scaledView->getHeight(), 0.0f, 0.0f, pR->W(), pR->H(), 1.0f, LICE_BLIT_MODE_COPY | LICE_BLIT_USE_ALPHA | LICE_BLIT_FILTER_BILINEAR);
+
   BitBlt(dc, pR->L, pR->T, pR->W(), pR->H(), mDrawBitmap->getDC(), pR->L, pR->T, SRCCOPY);
+  //BitBlt(dc, pR->L, pR->T, scaledView->getWidth(), scaledView->getHeight(), scaledView->getDC(), pR->L, pR->T, SRCCOPY);
   EndPaint(hWnd, &ps);
   return true;
 }
@@ -653,8 +660,11 @@ void* IGraphicsWin::OpenWindow(void* pParentWnd)
     RegisterClass(&wndClass);
   }
 
+  int scale = GetScaleForHWND((HWND)pParentWnd);
+  int width = w * scale;
+  int height = h * scale;
   sFPS = FPS();
-  mPlugWnd = CreateWindow(wndClassName, "IPlug", WS_CHILD | WS_VISIBLE, // | WS_CLIPCHILDREN | WS_CLIPSIBLINGS,
+  mPlugWnd = CreateWindow(wndClassName, "IPlug", WS_CHILD | WS_VISIBLE | WS_CLIPCHILDREN | WS_CLIPSIBLINGS,
                           x, y, w, h, (HWND) pParentWnd, 0, mHInstance, this);
   //SetWindowLong(mPlugWnd, GWL_USERDATA, (LPARAM) this);
 

@@ -8,7 +8,7 @@
     <VST3_64_HOST_PATH>$(ProgramW6432)\Steinberg\VST3PluginTestHost\VST3PluginTestHost.exe</VST3_64_HOST_PATH>
     <VST3_32_PATH>$(CommonProgramFiles)\VST3</VST3_32_PATH>
     <VST3_64_PATH>$(CommonProgramW6432)\VST3</VST3_64_PATH>
-    <WDL_PATH>$(ProjectDir)..\..\WDL</WDL_PATH>
+    <WDL_PATH>$(ProjectDir)..\..\wdl-ol\WDL</WDL_PATH>
     <x64_LIB_PATHS>$(ProgramW6432)\Microsoft SDKs\Windows\v7.1\Lib\x64;$(ProgramFiles)\Microsoft SDKs\Windows\v7.1\Lib\x64</x64_LIB_PATHS>
     <RTAS_PLUGINS_PATH>$(ProgramFiles)\Avid\ProTools_3PDev\dae\Plug-Ins</RTAS_PLUGINS_PATH>
     <AAX_PLUGINS_PATH>$(ProgramFiles)\Avid\ProTools_3PDev\dae\Plug-Ins</AAX_PLUGINS_PATH>

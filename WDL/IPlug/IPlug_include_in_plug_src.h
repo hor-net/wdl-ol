@@ -17,6 +17,25 @@
   }
   #endif
 
+  UINT(WINAPI* __GetDpiForWindow)(HWND);
+
+  int GetScaleForHWND(HWND hWnd)
+  {
+    if (!__GetDpiForWindow)
+    {
+        HINSTANCE h = LoadLibraryA("user32.dll");
+        if (h) *(void**)&__GetDpiForWindow = GetProcAddress(h, "GetDpiForWindow");
+        
+        if (!__GetDpiForWindow)
+            return 1;
+    }
+        int dpi = __GetDpiForWindow(hWnd);
+        if (dpi != 96)
+            return static_cast<int>(std::round(static_cast<double>(dpi) / 96));
+      
+        return 1;
+  }
+
   IGraphics* MakeGraphics(IPlug* pPlug, int w, int h, int FPS = 0)
   {
     IGraphicsWin* pGraphics = new IGraphicsWin(pPlug, w, h, FPS);
