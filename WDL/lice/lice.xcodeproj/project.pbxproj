@@ -576,7 +576,7 @@
 			baseConfigurationReference = 4F8D4BAD13E974CF004F7633 /* lice.xcconfig */;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
-				ARCHS = "$(ARCHS_STANDARD_64_BIT)";
+				ARCHS = "$(ARCHS_STANDARD)";
 				CLANG_CXX_LANGUAGE_STANDARD = "c++0x";
 				CLANG_CXX_LIBRARY = "libc++";
 				COMBINE_HIDPI_IMAGES = YES;
@@ -597,7 +597,7 @@
 					"$(inherited)",
 					"$(PROJECT_DIR)/build-mac/Debug",
 				);
-				MACOSX_DEPLOYMENT_TARGET = 10.7;
+				MACOSX_DEPLOYMENT_TARGET = 10.11;
 				PRODUCT_NAME = lice;
 				SDKROOT = macosx;
 				SKIP_INSTALL = YES;
@@ -610,7 +610,7 @@
 			baseConfigurationReference = 4F8D4BAD13E974CF004F7633 /* lice.xcconfig */;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
-				ARCHS = "$(ARCHS_STANDARD_64_BIT)";
+				ARCHS = "$(ARCHS_STANDARD)";
 				CLANG_CXX_LANGUAGE_STANDARD = "c++0x";
 				CLANG_CXX_LIBRARY = "libc++";
 				COMBINE_HIDPI_IMAGES = YES;
@@ -627,7 +627,7 @@
 					"$(inherited)",
 					"$(PROJECT_DIR)/build-mac/Debug",
 				);
-				MACOSX_DEPLOYMENT_TARGET = 10.7;
+				MACOSX_DEPLOYMENT_TARGET = 10.11;
 				PRODUCT_NAME = lice;
 				SDKROOT = macosx;
 				SKIP_INSTALL = YES;
@@ -651,10 +651,10 @@
 				GCC_VERSION = "";
 				GCC_WARN_ABOUT_RETURN_TYPE = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				MACOSX_DEPLOYMENT_TARGET = 10.7;
+				MACOSX_DEPLOYMENT_TARGET = 10.11;
 				ONLY_ACTIVE_ARCH = NO;
 				PREBINDING = NO;
-				SDKROOT = macosx10.12;
+				SDKROOT = macosx;
 				SYMROOT = "build-mac";
 			};
 			name = Debug;
@@ -672,10 +672,10 @@
 				GCC_VERSION = "";
 				GCC_WARN_ABOUT_RETURN_TYPE = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				MACOSX_DEPLOYMENT_TARGET = 10.7;
+				MACOSX_DEPLOYMENT_TARGET = 10.11;
 				ONLY_ACTIVE_ARCH = NO;
 				PREBINDING = NO;
-				SDKROOT = macosx10.12;
+				SDKROOT = macosx;
 				SYMROOT = "build-mac";
 			};
 			name = Release;

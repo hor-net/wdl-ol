@@ -351,7 +351,7 @@ void IPlugAAX::RenderAudio(AAX_SIPlugRenderInfo* ioRenderInfo)
 	SetInputChannelConnections(0, numInChannels, true);
 #endif
 	printf("attach input buffers: 0 - %d\n", NInChannels());
-	AttachInputBuffers(0, numInChannels, ioRenderInfo->mAudioInputs, numSamples);
+	AttachInputBuffers(0, NInChannels(), ioRenderInfo->mAudioInputs, numSamples);
 	
 	 //AttachInputBuffers(numInChannels, NInChannels() - numInChannels, ioRenderInfo->mAudioInputs, numSamples);
 	
