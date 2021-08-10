@@ -503,6 +503,7 @@ public:
 		mText = *pText;
 		//mTextRECT = IRECT(mRECT.L, mRECT.B-20, mRECT.R, mRECT.B);
 		mImgRECT = IRECT(x, y, pBitmap);
+        mRECT = mImgRECT;
 		mDisablePrompt = false;
 		mShowParamLabel = showParamLabel;
 		
@@ -519,7 +520,7 @@ public:
 				mTargetRECT.T = mTextRECT.T;
 				break;
 			case kTxtPosMiddle:
-				mTextRECT = IRECT(mImgRECT.L, captionTop, mImgRECT.L+mImgRECT.W(), captionTop+captionHeight);
+				mTextRECT = IRECT(mImgRECT.L+mImgRECT.W()*0.2, captionTop, mImgRECT.L+mImgRECT.W()*0.8, captionTop+captionHeight);
 				break;
 			case kTxtPosLeft:
 				mTextRECT = IRECT(mImgRECT.L - mImgRECT.W(), captionTop, mImgRECT.L, captionTop+captionHeight);

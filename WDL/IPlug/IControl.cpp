@@ -129,10 +129,11 @@ void IControl::PromptUserInput()
     {
       int cX = (int) mRECT.MW();
       int cY = (int) mRECT.MH();
-      int halfW = int(float(PARAM_EDIT_W)/2.f);
-      int halfH = int(float(PARAM_EDIT_H)/2.f);
-			//int halfW = int(float(mRECT.W())/2.f);
-			//int halfH = int(float(mRECT.H())/2.f);
+      //int halfW = int(float(PARAM_EDIT_W)/2.f);
+      //int halfH = int(float(PARAM_EDIT_H)/2.f);
+      int halfW = int(float(mRECT.W()) * 0.6f);
+      int halfH = int(float(mRECT.H()) * 0.6f);
+			
 			
       IRECT txtRECT = IRECT(cX - halfW, cY - halfH, cX + halfW,cY + halfH);
       mPlug->GetGUI()->PromptUserInput(this, mPlug->GetParam(mParamIdx), &txtRECT );
@@ -678,10 +679,11 @@ bool IKnobMultiControlText::Draw(IGraphics* pGraphics)
 
 	if (CSTR_NOT_EMPTY(cStr)) {
 		// measure the text size
-		pGraphics->DrawIText(&mText, mStr.Get(), &mTextRECT,true);
-		mTextRECT.B = mTextRECT.T + mText.mSize + 4;
+        IRECT tmpTxt = mTextRECT;
+		pGraphics->DrawIText(&mText, mStr.Get(), &tmpTxt,true);
+		tmpTxt.B = tmpTxt.T + mText.mSize + 4;
 		// draw text
-		return pGraphics->DrawIText(&mText, mStr.Get(), &mTextRECT);
+		return pGraphics->DrawIText(&mText, mStr.Get(), &tmpTxt);
 	}
 	return true;
 }
