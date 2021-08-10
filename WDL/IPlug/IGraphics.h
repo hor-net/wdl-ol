@@ -141,9 +141,11 @@ public:
   IGraphics(IPlugBase* pPlug, int w, int h, int refreshFPS = 0);
   virtual ~IGraphics();
 
-  int Width() { return mWidth; }
-  int Height() { return mHeight; }
+  int Width() { return mWidth * GetSystemGUIScaleRatio(); }
+  int Height() { return mHeight * GetSystemGUIScaleRatio(); }
   int FPS() { return mFPS; }
+  
+  virtual double GetSystemGUIScaleRatio() = 0;
 
   IPlugBase* GetPlug() { return mPlug; }
 

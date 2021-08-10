@@ -12,6 +12,8 @@ class IGraphicsWin : public IGraphics
 public:
   IGraphicsWin(IPlugBase* pPlug, int w, int h, int refreshFPS);
   virtual ~IGraphicsWin();
+  
+  double GetSystemGUIScaleRatio();
 
   void SetHInstance(HINSTANCE hInstance) { mHInstance = hInstance; }
 

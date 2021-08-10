@@ -1109,6 +1109,10 @@ void IGraphics::SetStrictDrawing(bool strict)
 
 void IGraphics::OnMouseDown(int x, int y, IMouseMod* pMod)
 {
+  
+  x /= GetSystemGUIScaleRatio();
+  y /= GetSystemGUIScaleRatio();
+  
   ReleaseMouseCapture();
   int c = GetMouseControlIdx(x, y);
   if (c >= 0)
@@ -1163,6 +1167,10 @@ void IGraphics::OnMouseDown(int x, int y, IMouseMod* pMod)
 
 void IGraphics::OnMouseUp(int x, int y, IMouseMod* pMod)
 {
+  
+  x /= GetSystemGUIScaleRatio();
+  y /= GetSystemGUIScaleRatio();
+  
   int c = GetMouseControlIdx(x, y);
   mMouseCapture = mMouseX = mMouseY = -1;
   if (c >= 0)
@@ -1180,6 +1188,10 @@ void IGraphics::OnMouseUp(int x, int y, IMouseMod* pMod)
 
 bool IGraphics::OnMouseOver(int x, int y, IMouseMod* pMod)
 {
+  
+  x /= GetSystemGUIScaleRatio();
+  y /= GetSystemGUIScaleRatio();
+  
   if (mHandleMouseOver)
   {
     int c = GetMouseControlIdx(x, y, true);
@@ -1212,6 +1224,10 @@ void IGraphics::OnMouseOut()
 
 void IGraphics::OnMouseDrag(int x, int y, IMouseMod* pMod)
 {
+  
+  x /= GetSystemGUIScaleRatio();
+  y /= GetSystemGUIScaleRatio();
+  
   int c = mMouseCapture;
   if (c >= 0)
   {
@@ -1228,6 +1244,10 @@ void IGraphics::OnMouseDrag(int x, int y, IMouseMod* pMod)
 
 bool IGraphics::OnMouseDblClick(int x, int y, IMouseMod* pMod)
 {
+  
+  x /= GetSystemGUIScaleRatio();
+  y /= GetSystemGUIScaleRatio();
+  
   ReleaseMouseCapture();
   bool newCapture = false;
   int c = GetMouseControlIdx(x, y);
@@ -1252,6 +1272,10 @@ bool IGraphics::OnMouseDblClick(int x, int y, IMouseMod* pMod)
 
 void IGraphics::OnMouseWheel(int x, int y, IMouseMod* pMod, int d)
 {
+  
+  x /= GetSystemGUIScaleRatio();
+  y /= GetSystemGUIScaleRatio();
+  
   int c = GetMouseControlIdx(x, y);
   if (c >= 0)
   {
@@ -1266,6 +1290,7 @@ void IGraphics::ReleaseMouseCapture()
 
 bool IGraphics::OnKeyDown(int x, int y, int key)
 {
+  
   int c = GetMouseControlIdx(x, y);
   if (c > 0)
     return mControls.Get(c)->OnKeyDown(x, y, key);
@@ -1277,6 +1302,7 @@ bool IGraphics::OnKeyDown(int x, int y, int key)
 
 int IGraphics::GetMouseControlIdx(int x, int y, bool mo)
 {
+  
   if (mMouseCapture >= 0)
   {
     return mMouseCapture;

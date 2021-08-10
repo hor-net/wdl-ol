@@ -58,7 +58,7 @@ LRESULT CALLBACK IGraphicsWin::WndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARA
     SetWindowLongPtr(hWnd, GWLP_USERDATA, (LPARAM) (lpcs->lpCreateParams));
     int mSec = int(1000.0 / sFPS);
     SetTimer(hWnd, IPLUG_TIMER_ID, mSec, NULL);
-    SetFocus(hWnd); // gets scroll wheel working straight away
+    //SetFocus(hWnd); // gets scroll wheel working straight away
     return 0;
   }
 
@@ -140,6 +140,14 @@ LRESULT CALLBACK IGraphicsWin::WndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARA
         IRECT dirtyR;
         if (pGraphics->IsDirty(&dirtyR))
         {
+          
+          float scale = pGraphics->GetSystemGUIScaleRatio();
+          dirtyR.L *= scale;
+          dirtyR.T *= scale;
+          dirtyR.R *= scale;
+          dirtyR.B *= scale;
+          
+          
           RECT r = { dirtyR.L, dirtyR.T, dirtyR.R, dirtyR.B };
 
           InvalidateRect(hWnd, &r, FALSE);
@@ -332,7 +340,8 @@ LRESULT CALLBACK IGraphicsWin::WndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARA
       RECT r;
       if (GetUpdateRect(hWnd, &r, FALSE))
       {
-        IRECT ir(r.left, r.top, r.right, r.bottom);
+          float scale = pGraphics->GetSystemGUIScaleRatio();
+        IRECT ir(r.left/scale, r.top/scale, r.right/scale, r.bottom/scale);
         pGraphics->Draw(&ir);
       }
       return 0;
@@ -546,6 +555,20 @@ void IGraphicsWin::ForceEndUserEdit()
 
 #define SETPOS_FLAGS SWP_NOZORDER | SWP_NOMOVE | SWP_NOACTIVATE
 
+double IGraphicsWin::GetSystemGUIScaleRatio()
+{
+  HDC screen = GetDC(0);
+
+  int dpiX = GetDeviceCaps(screen, LOGPIXELSX);
+  int dpiY = GetDeviceCaps(screen, LOGPIXELSY);
+
+  ReleaseDC(0, screen);
+
+  int dpi = IPMAX(dpiX, dpiY);
+
+  return (double)dpi / 96.0;
+}
+
 void IGraphicsWin::Resize(int w, int h)
 {
   if (w == Width() && h == Height()) return;
@@ -627,11 +650,20 @@ bool IGraphicsWin::DrawScreen(IRECT* pR)
   PAINTSTRUCT ps;
   HWND hWnd = (HWND) GetWindow();
   HDC dc = BeginPaint(hWnd, &ps);
+  
+  float scale = GetSystemGUIScaleRatio();
+  float destX = pR->L * scale;
+  float destY = pR->T * scale;
+  float destW = pR->W() * scale;
+  float destH = pR->H() * scale;
+  
   //int scale = GetScaleForHWND(hWnd);
   //LICE_SysBitmap* scaledView = new LICE_SysBitmap(pR->W() * scale, pR->H() * scale);
   //_LICE::LICE_ScaledBlit(scaledView, mDrawBitmap, pR->L, pR->T, scaledView->getWidth(), scaledView->getHeight(), 0.0f, 0.0f, pR->W(), pR->H(), 1.0f, LICE_BLIT_MODE_COPY | LICE_BLIT_USE_ALPHA | LICE_BLIT_FILTER_BILINEAR);
 
-  BitBlt(dc, pR->L, pR->T, pR->W(), pR->H(), mDrawBitmap->getDC(), pR->L, pR->T, SRCCOPY);
+  StretchBlt(dc, destX,destY, destW, destH, mDrawBitmap->getDC(), pR->L, pR->T, pR->W(), pR->H(), SRCCOPY);
+  
+  //BitBlt(dc, pR->L, pR->T, pR->W(), pR->H(), mDrawBitmap->getDC(), pR->L, pR->T, SRCCOPY);
   //BitBlt(dc, pR->L, pR->T, scaledView->getWidth(), scaledView->getHeight(), scaledView->getDC(), pR->L, pR->T, SRCCOPY);
   EndPaint(hWnd, &ps);
   return true;
@@ -660,12 +692,12 @@ void* IGraphicsWin::OpenWindow(void* pParentWnd)
     RegisterClass(&wndClass);
   }
 
-  int scale = GetScaleForHWND((HWND)pParentWnd);
+  int scale = GetSystemGUIScaleRatio(); //GetScaleForHWND((HWND)pParentWnd);
   int width = w * scale;
   int height = h * scale;
   sFPS = FPS();
   mPlugWnd = CreateWindow(wndClassName, "IPlug", WS_CHILD | WS_VISIBLE | WS_CLIPCHILDREN | WS_CLIPSIBLINGS,
-                          x, y, w, h, (HWND) pParentWnd, 0, mHInstance, this);
+                          x, y, width, height, (HWND) pParentWnd, 0, mHInstance, this);
   //SetWindowLong(mPlugWnd, GWL_USERDATA, (LPARAM) this);
 
   if (!mPlugWnd && --nWndClassReg == 0)
@@ -919,8 +951,10 @@ IPopupMenu* IGraphicsWin::CreateIPopupMenu(IPopupMenu* pMenu, IRECT* pAreaRect)
   {
     POINT cPos;
 
-    cPos.x = pAreaRect->L;
-    cPos.y = pAreaRect->B;
+    float scale =GetSystemGUIScaleRatio();
+    
+    cPos.x = pAreaRect->L * scale;
+    cPos.y = pAreaRect->B * scale;
 
     ClientToScreen(mPlugWnd, &cPos);
 
@@ -974,11 +1008,13 @@ void IGraphicsWin::CreateTextEntry(IControl* pControl, IText* pText, IRECT* pTex
     default:                  editStyle = ES_CENTER; break;
   }
 
+  float scale = GetSystemGUIScaleRatio();
+  
   mParamEditWnd = CreateWindow("EDIT", pString, ES_AUTOHSCROLL /*only works for left aligned text*/ | WS_CHILD | WS_VISIBLE | ES_MULTILINE | editStyle,
-                               pTextRect->L, pTextRect->T, pTextRect->W()+1, pTextRect->H()+1,
+                               pTextRect->L*scale, pTextRect->T*scale, pTextRect->W()*scale+1, pTextRect->H()*scale+1,
                                mPlugWnd, (HMENU) PARAM_EDIT_ID, mHInstance, 0);
 
-  HFONT font = CreateFont(pText->mSize, 0, 0, 0, pText->mStyle == IText::kStyleBold ? FW_BOLD : 0, pText->mStyle == IText::kStyleItalic ? TRUE : 0, 0, 0, 0, 0, 0, 0, 0, pText->mFont);
+  HFONT font = CreateFont(pText->mSize*scale, 0, 0, 0, pText->mStyle == IText::kStyleBold ? FW_BOLD : 0, pText->mStyle == IText::kStyleItalic ? TRUE : 0, 0, 0, 0, 0, 0, 0, 0, pText->mFont);
 
   SendMessage(mParamEditWnd, EM_LIMITTEXT, (WPARAM) pControl->GetTextEntryLength(), 0);
   SendMessage(mParamEditWnd, WM_SETFONT, (WPARAM) font, 0);

@@ -200,6 +200,16 @@ IGraphicsMac::~IGraphicsMac()
   }
 }
 
+
+double IGraphicsMac::GetSystemGUIScaleRatio()
+{
+    // More info for getting GUI scaling https://developer.apple.com/library/content/documentation/GraphicsAnimation/Conceptual/HighResolutionOSX/APIs/APIs.html
+        
+    double mainScreenScalingRatio = [[NSScreen mainScreen] backingScaleFactor];
+    //return mainScreenScalingRatio;
+  return 1.;
+}
+
 LICE_IBitmap* LoadImgFromResourceOSX(const char* bundleID, const char* filename)
 {
   if (!filename) return 0;
