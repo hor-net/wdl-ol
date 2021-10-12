@@ -299,6 +299,7 @@ tresult PLUGIN_API IPlugVST3::setBusArrangements(SpeakerArrangement* inputs, int
 		audioInputs.remove(bus);
 		addAudioInput(USTRING("Input"), getSpeakerArrForChans(reqNumInputChannels));
 	}
+	SetInputChannelConnections(0, reqNumInputChannels, true);
 	
 	// handle output
 	bus = FCast<AudioBus>(audioOutputs.at(0));
@@ -308,6 +309,7 @@ tresult PLUGIN_API IPlugVST3::setBusArrangements(SpeakerArrangement* inputs, int
 		audioOutputs.remove(bus);
 		addAudioOutput(USTRING("Output"), getSpeakerArrForChans(reqNumOutputChannels));
 	}
+	SetOutputChannelConnections(0, reqNumOutputChannels, true);
 	
 	if (!mScChans && numIns == 1) // No sidechain, every thing OK
 	{
