@@ -138,6 +138,12 @@ LRESULT CALLBACK IGraphicsWin::WndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARA
         IRECT dirtyR;
         if (pGraphics->IsDirty(&dirtyR))
         {
+            float scale = pGraphics->GetSystemGUIScaleRatio();
+            dirtyR.L *= scale;
+            dirtyR.T *= scale;
+            dirtyR.R *= scale;
+            dirtyR.B *= scale;
+
           RECT r = { dirtyR.L, dirtyR.T, dirtyR.R, dirtyR.B };
 
           InvalidateRect(hWnd, &r, FALSE);
@@ -690,7 +696,18 @@ bool IGraphicsWin::DrawScreen(IRECT* pR)
   PAINTSTRUCT ps;
   HWND hWnd = (HWND) GetWindow();
   HDC dc = BeginPaint(hWnd, &ps);
-  BitBlt(dc, pR->L, pR->T, pR->W(), pR->H(), mDrawBitmap->getDC(), pR->L, pR->T, SRCCOPY);
+  float scale = GetSystemGUIScaleRatio();
+  float destX = pR->L * scale;
+  float destY = pR->T * scale;
+  float destW = pR->W() * scale;
+  float destH = pR->H() * scale;
+  //LICE_SysBitmap* pDest = new LICE_SysBitmap(destW, destH);
+  //_LICE::LICE_ScaledBlit(pDest, mDrawBitmap, 0, 0, destW, destH, 0.0f, 0.0f, (float)mDrawBitmap->getWidth(), (float)mDrawBitmap->getHeight(), 1.0f,
+  //    LICE_BLIT_MODE_COPY | LICE_BLIT_FILTER_BILINEAR);
+  //BitBlt(dc, pR->L, pR->T, pR->W(), pR->H(), mDrawBitmap->getDC(), pR->L, pR->T, SRCCOPY);
+  //BitBlt(dc, pR->L, pR->T, pR->W(), pR->H(), pDest->getDC(), pR->L, pR->T, SRCCOPY);
+  StretchBlt(dc, destX,destY, destW, destH, mDrawBitmap->getDC(), pR->L, pR->T, pR->W(), pR->H(), SRCCOPY);
+  
   EndPaint(hWnd, &ps);
   return true;
 }
@@ -718,9 +735,10 @@ void* IGraphicsWin::OpenWindow(void* pParentWnd)
     RegisterClass(&wndClass);
   }
 
+  float scale = GetSystemGUIScaleRatio();
   sFPS = FPS();
   mPlugWnd = CreateWindow(wndClassName, "IPlug", WS_CHILD | WS_VISIBLE, // | WS_CLIPCHILDREN | WS_CLIPSIBLINGS,
-                          x, y, w, h, (HWND) pParentWnd, 0, mHInstance, this);
+                          x, y, w*scale, h*scale, (HWND) pParentWnd, 0, mHInstance, this);
   //SetWindowLong(mPlugWnd, GWL_USERDATA, (LPARAM) this);
 
   if (!mPlugWnd && --nWndClassReg == 0)
@@ -988,8 +1006,10 @@ IPopupMenu* IGraphicsWin::CreateIPopupMenu(IPopupMenu* pMenu, IRECT* pAreaRect)
   {
     POINT cPos;
 
-    cPos.x = pAreaRect->L;
-    cPos.y = pAreaRect->B;
+    float scale =GetSystemGUIScaleRatio();
+  
+    cPos.x = pAreaRect->L * scale;
+    cPos.y = pAreaRect->B * scale;
 
     ClientToScreen(mPlugWnd, &cPos);
 
@@ -1042,12 +1062,14 @@ void IGraphicsWin::CreateTextEntry(IControl* pControl, IText* pText, IRECT* pTex
     case IText::kAlignCenter:
     default:                  editStyle = ES_CENTER; break;
   }
+  
+  float scale = GetSystemGUIScaleRatio();
 
   mParamEditWnd = CreateWindow("EDIT", pString, ES_AUTOHSCROLL /*only works for left aligned text*/ | WS_CHILD | WS_VISIBLE | ES_MULTILINE | editStyle,
-                               pTextRect->L, pTextRect->T, pTextRect->W()+1, pTextRect->H()+1,
+                               pTextRect->L*scale, pTextRect->T*scale, pTextRect->W()*scale+1, pTextRect->H()*scale+1,
                                mPlugWnd, (HMENU) PARAM_EDIT_ID, mHInstance, 0);
 
-  HFONT font = CreateFont(pText->mSize, 0, 0, 0, pText->mStyle == IText::kStyleBold ? FW_BOLD : 0, pText->mStyle == IText::kStyleItalic ? TRUE : 0, 0, 0, 0, 0, 0, 0, 0, pText->mFont);
+  HFONT font = CreateFont(pText->mSize*scale, 0, 0, 0, pText->mStyle == IText::kStyleBold ? FW_BOLD : 0, pText->mStyle == IText::kStyleItalic ? TRUE : 0, 0, 0, 0, 0, 0, 0, 0, pText->mFont);
 
   SendMessage(mParamEditWnd, EM_LIMITTEXT, (WPARAM) pControl->GetTextEntryLength(), 0);
   SendMessage(mParamEditWnd, WM_SETFONT, (WPARAM) font, 0);

@@ -222,7 +222,8 @@ double IGraphicsMac::GetSystemGUIScaleRatio()
     // More info for getting GUI scaling https://developer.apple.com/library/content/documentation/GraphicsAnimation/Conceptual/HighResolutionOSX/APIs/APIs.html
         
     double mainScreenScalingRatio = [[NSScreen mainScreen] backingScaleFactor];
-    return mainScreenScalingRatio;
+    //return mainScreenScalingRatio;
+  return 1.;
 }
 
 bool IGraphicsMac::DrawScreen(IRECT* pR)
