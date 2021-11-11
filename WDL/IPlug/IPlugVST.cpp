@@ -789,10 +789,10 @@ VstIntPtr VSTCALLBACK IPlugVST::VSTDispatcher(AEffect *pEffect, VstInt32 opCode,
     }
     case effSetProgram:
     {
-      if (_this->DoesStateChunks() == false)
-      {
+      //if (_this->DoesStateChunks() == false)
+      //{
         _this->ModifyCurrentPreset(); // TODO: test, something is funny about this http://forum.cockos.com/showpost.php?p=485113&postcount=22
-      }
+      //}
       _this->RestorePreset((int) value);
       return 0;
     }
