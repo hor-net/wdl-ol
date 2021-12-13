@@ -343,7 +343,8 @@ LRESULT CALLBACK IGraphicsWin::WndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARA
       RECT r;
       if (GetUpdateRect(hWnd, &r, FALSE))
       {
-        IRECT ir(r.left, r.top, r.right, r.bottom);
+        float scale = pGraphics->GetSystemGUIScaleRatio();
+        IRECT ir(r.left/scale, r.top/scale, r.right/scale, r.bottom/scale);
         pGraphics->Draw(&ir);
       }
       return 0;
