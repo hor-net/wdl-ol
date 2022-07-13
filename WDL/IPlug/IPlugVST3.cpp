@@ -478,9 +478,9 @@ tresult PLUGIN_API IPlugVST3::process(ProcessData& data)
 		if (data.numInputs)
 		{
 			
-#ifdef PLUG_SC_CHANS
-			//if (mScChans)
-			//{
+//#if PLUG_SC_CHANS > 0
+			if (mScChans)
+			{
 				if (getAudioInput(1)->isActive()) // Sidechain is active
 				{
 					mSidechainActive = true;
@@ -500,15 +500,15 @@ tresult PLUGIN_API IPlugVST3::process(ProcessData& data)
 				
 				AttachInputBuffers(0, NInChannels() - mScChans, data.inputs[0].channelBuffers32, data.numSamples);
 				AttachInputBuffers(mScChans, NInChannels() - mScChans, data.inputs[1].channelBuffers32, data.numSamples);
-#else
-			//}
-			//else
-			//{
+//#else
+			}
+			else
+			{
 				//SetInputChannelConnections(0, data.inputs[0].numChannels, true);
 				//SetInputChannelConnections(data.inputs[0].numChannels, NInChannels() - data.inputs[0].numChannels, false);
 				AttachInputBuffers(0, NInChannels(), data.inputs[0].channelBuffers32, data.numSamples);
-			//}
-#endif
+			}
+//#endif
 		}
 		
 		for (int outBus = 0, chanOffset = 0; outBus < data.numOutputs; outBus++)
