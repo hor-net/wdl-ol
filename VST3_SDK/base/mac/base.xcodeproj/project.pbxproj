@@ -441,7 +441,6 @@
 		08FB7793FE84155DC02AAC07 /* Project object */ = {
 			isa = PBXProject;
 			attributes = {
-				BuildIndependentTargetsInParallel = NO;
 				LastUpgradeCheck = 9999;
 				ORGANIZATIONNAME = Steinberg;
 			};
@@ -527,6 +526,8 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 4FA70847158B454300BFC572 /* common.xcconfig */;
 			buildSettings = {
+				ARCHS = "$(ARCHS_STANDARD)";
+				SDKROOT = macosx;
 			};
 			name = Debug;
 		};
@@ -534,7 +535,9 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 4FA70847158B454300BFC572 /* common.xcconfig */;
 			buildSettings = {
+				ARCHS = "$(ARCHS_STANDARD)";
 				DEPLOYMENT_POSTPROCESSING = NO;
+				SDKROOT = macosx;
 			};
 			name = Release;
 		};
