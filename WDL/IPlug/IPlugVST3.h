@@ -62,9 +62,9 @@ public:
 	IPlugView* PLUGIN_API createView (const char* name);
 	tresult PLUGIN_API setEditorState (IBStream* state);
 	tresult PLUGIN_API getEditorState (IBStream* state);
-	tresult PLUGIN_API setParamNormalized (ParamID tag, ParamValue value);
-	ParamValue PLUGIN_API getParamNormalized(ParamID tag);
-	ParamValue PLUGIN_API plainParamToNormalized(ParamID tag, ParamValue plainValue);
+	//tresult PLUGIN_API setParamNormalized (ParamID tag, ParamValue value);
+	//ParamValue PLUGIN_API getParamNormalized(ParamID tag);
+	//ParamValue PLUGIN_API plainParamToNormalized(ParamID tag, ParamValue plainValue);
 	tresult PLUGIN_API getParamStringByValue (ParamID tag, ParamValue valueNormalized, String128 string);
 	tresult PLUGIN_API getParamValueByString (ParamID tag, TChar* string, ParamValue& valueNormalized);
 	

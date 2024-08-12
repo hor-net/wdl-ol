@@ -764,7 +764,7 @@ tresult PLUGIN_API IPlugVST3::getEditorState(IBStream* state)
 	return kResultOk;
 }
 
-ParamValue PLUGIN_API IPlugVST3::plainParamToNormalized(ParamID tag, ParamValue plainValue)
+/*ParamValue PLUGIN_API IPlugVST3::plainParamToNormalized(ParamID tag, ParamValue plainValue)
 {
 	IParam* param = GetParam(tag);
 	
@@ -774,9 +774,9 @@ ParamValue PLUGIN_API IPlugVST3::plainParamToNormalized(ParamID tag, ParamValue 
 	}
 	
 	return plainValue;
-}
+}*/
 
-ParamValue PLUGIN_API IPlugVST3::getParamNormalized(ParamID tag)
+/*ParamValue PLUGIN_API IPlugVST3::getParamNormalized(ParamID tag)
 {
 	if (tag == kBypassParam)
 	{
@@ -795,9 +795,9 @@ ParamValue PLUGIN_API IPlugVST3::getParamNormalized(ParamID tag)
 	}
 	
 	return 0.0;
-}
+}*/
 
-tresult PLUGIN_API IPlugVST3::setParamNormalized(ParamID tag, ParamValue value)
+/*tresult PLUGIN_API IPlugVST3::setParamNormalized(ParamID tag, ParamValue value)
 {
   return kResultOk;
 	IParam* param = GetParam(tag);
@@ -809,7 +809,7 @@ tresult PLUGIN_API IPlugVST3::setParamNormalized(ParamID tag, ParamValue value)
 	}
 	
 	return kResultFalse;
-}
+}*/
 
 tresult PLUGIN_API IPlugVST3::getParamStringByValue(ParamID tag, ParamValue valueNormalized, String128 string)
 {
