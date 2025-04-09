@@ -69,30 +69,15 @@
     else
     {
       nsMenuItem = [self addItemWithTitle:nsMenuItemTitle action:@selector(OnMenuSelection:) keyEquivalent:@""];
-
-      if (menuItem->GetIsTitle ())
-      {
-        [nsMenuItem setIndentationLevel:1];
-      }
-
-      if (menuItem->GetChecked())
-      {
-        [nsMenuItem setState:NSOnState];
-      }
-      else
-      {
-        [nsMenuItem setState:NSOffState];
-      }
       
-      if (menuItem->GetEnabled())
-      {
-        [nsMenuItem setEnabled:YES];
-      }
-      else
-      {
-        [nsMenuItem setEnabled:NO];
-      }
-
+      [nsMenuItem setTarget:pView];
+    }
+    
+    if (nsMenuItem && !menuItem->GetIsSeparator())
+    {
+      [nsMenuItem setIndentationLevel:menuItem->GetIsTitle() ? 1 : 0 ];
+      [nsMenuItem setEnabled:menuItem->GetEnabled() ? YES : NO];
+      [nsMenuItem setState:menuItem->GetChecked() ? NSOnState : NSOffState];
     }
   }
 
@@ -647,43 +632,76 @@ inline int GetMouseOver(IGraphicsMac* pGraphics)
   IGRAPHICS_MENU_RCVR* dummyView = [[[IGRAPHICS_MENU_RCVR alloc] initWithFrame:rect] autorelease];
   NSMenu* nsMenu = [[[IGRAPHICS_NSMENU alloc] initWithIPopupMenuAndReciever:pMenu :dummyView] autorelease];
 
-  NSWindow* pWindow = [self window];
+  NSPoint wp = {rect.origin.x, rect.origin.y + rect.size.height + 4};
 
-  NSPoint wp = {rect.origin.x, rect.origin.y - 4};
-  wp = [self convertPointToBase:wp];
-  
-  //fix position for retina display
-  float displayScale = 1.0f;
-  NSScreen* screen = [pWindow screen];
-  if ([screen respondsToSelector: @selector (backingScaleFactor)])
-    displayScale = screen.backingScaleFactor;
-  wp.x /= displayScale;
-  wp.y /= displayScale;
+  NSMenuItem* pSelectedItem = nil;
+    
+  auto selectedItemIdx = pMenu->GetChosenItemIdx();
 
-  NSEvent* event = [NSEvent otherEventWithType:NSApplicationDefined
-                  location:wp
-                  modifierFlags:NSApplicationDefined
-                  timestamp: (NSTimeInterval) 0
-                  windowNumber: [pWindow windowNumber]
-                  context: [NSGraphicsContext currentContext]
-                    subtype:0
-                    data1: 0
-                    data2: 0];
-
-  [NSMenu popUpContextMenu:nsMenu withEvent:event forView:dummyView];
-
-  NSMenuItem* chosenItem = [dummyView MenuItem];
-  NSMenu* chosenMenu = [chosenItem menu];
-  IPopupMenu* associatedIPopupMenu = [(IGRAPHICS_NSMENU*) chosenMenu AssociatedIPopupMenu];
-
-  int chosenItemIdx = [chosenMenu indexOfItem: chosenItem];
-
-  if (chosenItemIdx > -1 && associatedIPopupMenu)
+  if (selectedItemIdx > -1)
   {
-    associatedIPopupMenu->SetChosenItemIdx(chosenItemIdx);
-    return associatedIPopupMenu;
+    pSelectedItem = [nsMenu itemAtIndex:selectedItemIdx];
   }
-  else return 0;
+    
+  if (pSelectedItem != nil)
+  {
+    wp = {rect.origin.x, rect.origin.y};
+  }
+    
+  [nsMenu popUpMenuPositioningItem:pSelectedItem atLocation:wp inView:self];
+    
+  NSMenuItem* pChosenItem = [dummyView MenuItem];
+  NSMenu* pChosenMenu = [pChosenItem menu];
+  IPopupMenu* pIPopupMenu = [(IGRAPHICS_NSMENU*) pChosenMenu AssociatedIPopupMenu];
+
+  long chosenItemIdx = [pChosenMenu indexOfItem: pChosenItem];
+
+  if (chosenItemIdx > -1 && pIPopupMenu)
+  {
+    pIPopupMenu->SetChosenItemIdx((int) chosenItemIdx);
+    return pIPopupMenu;
+  }
+  else
+    return nullptr;
+  
+//  NSWindow* pWindow = [self window];
+//
+//  //NSPoint wp = {rect.origin.x, rect.origin.y - 4};
+//  NSPoint wp = {rect.origin.x, rect.origin.y + rect.size.height + 4};
+//  wp = [self convertPointToBase:wp];
+//  
+//  //fix position for retina display
+//  float displayScale = 1.0f;
+//  //NSScreen* screen = [pWindow screen];
+//  //if ([screen respondsToSelector: @selector (backingScaleFactor)])
+//  //  displayScale = screen.backingScaleFactor;
+//  wp.x /= displayScale;
+//  wp.y /= displayScale;
+//
+//  NSEvent* event = [NSEvent otherEventWithType:NSApplicationDefined
+//                  location:wp
+//                  modifierFlags:NSApplicationDefined
+//                  timestamp: (NSTimeInterval) 0
+//                  windowNumber: [pWindow windowNumber]
+//                  context: [NSGraphicsContext currentContext]
+//                    subtype:0
+//                    data1: 0
+//                    data2: 0];
+//
+//  [NSMenu popUpContextMenu:nsMenu withEvent:event forView:dummyView];
+//
+//  NSMenuItem* chosenItem = [dummyView MenuItem];
+//  NSMenu* chosenMenu = [chosenItem menu];
+//  IPopupMenu* associatedIPopupMenu = [(IGRAPHICS_NSMENU*) chosenMenu AssociatedIPopupMenu];
+//
+//  int chosenItemIdx = [chosenMenu indexOfItem: chosenItem];
+//
+//  if (chosenItemIdx > -1 && associatedIPopupMenu)
+//  {
+//    associatedIPopupMenu->SetChosenItemIdx(chosenItemIdx);
+//    return associatedIPopupMenu;
+//  }
+//  else return 0;
 }
 
 - (void) createTextEntry: (IControl*) pControl : (IParam*) pParam : (IText*) pText : (const char*) pString : (NSRect) areaRect;
