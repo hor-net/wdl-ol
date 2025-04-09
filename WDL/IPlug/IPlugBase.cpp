@@ -597,6 +597,7 @@ void IPlugBase::ProcessDoubleReplacing(double** inputs, double** outputs, int nF
   int j = 0;
   for (i = 0; i < nOut; ++i)
   {
+    if(!IsOutChannelConnected(i)) break;
     if (i < nIn)
     {
       memcpy(outputs[i], inputs[i], nFrames * sizeof(double));
@@ -606,6 +607,7 @@ void IPlugBase::ProcessDoubleReplacing(double** inputs, double** outputs, int nF
   // zero remaining outs
   for (/* same j */; j < nOut; ++j)
   {
+    if(!IsOutChannelConnected(j)) break;
     memset(outputs[j], 0, nFrames * sizeof(double));
   }
 }
