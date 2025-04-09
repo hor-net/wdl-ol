@@ -411,11 +411,11 @@ tresult PLUGIN_API IPlugVST3::process(ProcessData& data)
             default:
               if (idx >= 0 && idx < NParams())
               {
-                if(GetHost() != kHostAbletonLive) {
+                //if(GetHost() != kHostAbletonLive) {
                   GetParam(idx)->SetNormalized((double)value);
                   if (GetGUI()) GetGUI()->SetParameterFromPlug(idx, (double)value, true);
                   OnParamChange(idx, kAutomation);
-                }
+                //}
               }
 #ifdef PLUG_DOES_MIDI
 							// if idx is > than NParams() we have MIDI CC
