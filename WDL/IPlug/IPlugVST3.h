@@ -22,7 +22,7 @@ using namespace Vst;
 class IPlugVST3View;
 
 class IPlugVST3 : public IPlugBase
-, public IUnitInfo
+//, public IUnitInfo
 , public SingleComponentEffect
 , public IMidiMapping
 {
@@ -62,8 +62,8 @@ public:
 	IPlugView* PLUGIN_API createView (const char* name);
 	tresult PLUGIN_API setEditorState (IBStream* state);
 	tresult PLUGIN_API getEditorState (IBStream* state);
-	//tresult PLUGIN_API setParamNormalized (ParamID tag, ParamValue value);
-	//ParamValue PLUGIN_API getParamNormalized(ParamID tag);
+	tresult PLUGIN_API setParamNormalized (ParamID tag, ParamValue value);
+	ParamValue PLUGIN_API getParamNormalized(ParamID tag);
 	//ParamValue PLUGIN_API plainParamToNormalized(ParamID tag, ParamValue plainValue);
 	tresult PLUGIN_API getParamStringByValue (ParamID tag, ParamValue valueNormalized, String128 string);
 	tresult PLUGIN_API getParamValueByString (ParamID tag, TChar* string, ParamValue& valueNormalized);
@@ -150,7 +150,7 @@ private:
 	bool mSidechainActive;
 	//  IMidiQueue mMidiOutputQueue;
 	ProcessContext *mProcessContext;
-	TArray <IPlugVST3View*> viewsArray;
+	std::vector <IPlugVST3View*> viewsArray;
 	
 	friend class IPlugVST3View;
 };

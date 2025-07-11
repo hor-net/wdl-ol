@@ -18,7 +18,9 @@
 #define _UINT32 // this is necessary to get VST3 to compile with the 10.6 SDK due to a conflict
 #endif
 
+#ifndef IPLUG_NO_CARBON_SUPPORT
 #include <Carbon/Carbon.h>
+#endif
 
 #ifndef DEFAULT_PATH_OSX
 #define DEFAULT_PATH_OSX "~/Desktop"
@@ -188,11 +190,13 @@ struct CStrLocal
     }
 };
 
+#ifndef IPLUG_NO_CARBON_SUPPORT
 inline CGRect ToCGRect(int h, IRECT* pR)
 {
     int B = h - pR->B;
     return CGRectMake(pR->L, B, pR->W(), B + pR->H());
 }
+#endif
 
 inline int AdjustFontSize(int size)
 {

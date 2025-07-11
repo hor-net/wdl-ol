@@ -1,0 +1,149 @@
+// !$*UTF8*$!
+{
+	089C1669FE841209C02AAC07 /* Project object */ = {
+		activeBuildConfigurationName = Debug;
+		activeExecutable = 56B8917B19D8700400D34DA4 /* APP */;
+		activeTarget = 4F78DAF113B643600032E0F3 /* All */;
+		codeSenseManager = 56B891A419D8701D00D34DA4 /* Code sense */;
+		executables = (
+			56B8917B19D8700400D34DA4 /* APP */,
+		);
+		perUserDictionary = {
+			PBXConfiguration.PBXFileTableDataSource3.PBXFileTableDataSource = {
+				PBXFileTableDataSourceColumnSortingDirectionKey = "-1";
+				PBXFileTableDataSourceColumnSortingKey = PBXFileDataSource_Filename_ColumnID;
+				PBXFileTableDataSourceColumnWidthsKey = (
+					20,
+					848,
+					20,
+					48.16259765625,
+					43,
+					43,
+					20,
+				);
+				PBXFileTableDataSourceColumnsKey = (
+					PBXFileDataSource_FiletypeID,
+					PBXFileDataSource_Filename_ColumnID,
+					PBXFileDataSource_Built_ColumnID,
+					PBXFileDataSource_ObjectSize_ColumnID,
+					PBXFileDataSource_Errors_ColumnID,
+					PBXFileDataSource_Warnings_ColumnID,
+					PBXFileDataSource_Target_ColumnID,
+				);
+			};
+			PBXPerProjectTemplateStateSaveDate = 433614852;
+			PBXWorkspaceStateSaveDate = 433614852;
+		};
+		perUserProjectItems = {
+			56B8919B19D8701D00D34DA4 /* PBXTextBookmark */ = 56B8919B19D8701D00D34DA4 /* PBXTextBookmark */;
+			56B8919C19D8701D00D34DA4 /* PBXBookmark */ = 56B8919C19D8701D00D34DA4 /* PBXBookmark */;
+			56B891A519D9A27A00D34DA4 /* PBXTextBookmark */ = 56B891A519D9A27A00D34DA4 /* PBXTextBookmark */;
+		};
+		sourceControlManager = 56B891A319D8701D00D34DA4 /* Source Control */;
+		userBuildSettings = {
+		};
+	};
+	4F20EEC8132C69FE0030E34C /* VST2 */ = {
+		activeExec = 0;
+	};
+	4F3AE17812C0E5E2001FD7A4 /* AU */ = {
+		activeExec = 0;
+	};
+	4F78DAF113B643600032E0F3 /* All */ = {
+		activeExec = 0;
+	};
+	4F7F5C4213E95EC8002918FD /* RTAS */ = {
+		activeExec = 0;
+	};
+	4F9828AA140A9EB700F3FCC1 /* VST3 */ = {
+		activeExec = 0;
+	};
+	4FB3624E13B648FE00DB6B76 /* main.mm */ = {
+		uiCtxt = {
+			sepNavIntBoundsRect = "{{0, 0}, {519, 245}}";
+			sepNavSelRange = "{0, 0}";
+			sepNavVisRange = "{0, 119}";
+		};
+	};
+	4FB600121567CB0A0020189A /* AAX */ = {
+		activeExec = 0;
+	};
+	4FD16A0813B63081001D0217 /* APP */ = {
+		activeExec = 0;
+		executables = (
+			56B8917B19D8700400D34DA4 /* APP */,
+		);
+	};
+	4FD16CA013B6327C001D0217 /* app_main.cpp */ = {
+		uiCtxt = {
+			sepNavIntBoundsRect = "{{0, 0}, {1011, 13637}}";
+			sepNavSelRange = "{0, 0}";
+			sepNavVisRange = "{87, 928}";
+		};
+	};
+	56B8917B19D8700400D34DA4 /* APP */ = {
+		isa = PBXExecutable;
+		activeArgIndices = (
+		);
+		argumentStrings = (
+		);
+		autoAttachOnCrash = 1;
+		breakpointsEnabled = 0;
+		configStateDict = {
+		};
+		customDataFormattersEnabled = 1;
+		dataTipCustomDataFormattersEnabled = 1;
+		dataTipShowTypeColumn = 1;
+		dataTipSortType = 0;
+		debuggerPlugin = GDBDebugging;
+		disassemblyDisplayState = 0;
+		enableDebugStr = 1;
+		environmentEntries = (
+		);
+		executableSystemSymbolLevel = 0;
+		executableUserSymbolLevel = 0;
+		libgmallocEnabled = 0;
+		name = APP;
+		showTypeColumn = 0;
+		sourceDirectories = (
+		);
+	};
+	56B8919B19D8701D00D34DA4 /* PBXTextBookmark */ = {
+		isa = PBXTextBookmark;
+		fRef = 4FB3624E13B648FE00DB6B76 /* main.mm */;
+		name = "main.mm: 1";
+		rLen = 0;
+		rLoc = 0;
+		rType = 0;
+		vrLen = 119;
+		vrLoc = 0;
+	};
+	56B8919C19D8701D00D34DA4 /* PBXBookmark */ = {
+		isa = PBXBookmark;
+		fRef = 4FD16CA013B6327C001D0217 /* app_main.cpp */;
+	};
+	56B891A319D8701D00D34DA4 /* Source Control */ = {
+		isa = PBXSourceControlManager;
+		fallbackIsa = XCSourceControlManager;
+		isSCMEnabled = 0;
+		scmConfiguration = {
+			repositoryNamesForRoots = {
+				"" = "";
+			};
+		};
+	};
+	56B891A419D8701D00D34DA4 /* Code sense */ = {
+		isa = PBXCodeSenseManager;
+		indexTemplatePath = "";
+	};
+	56B891A519D9A27A00D34DA4 /* PBXTextBookmark */ = {
+		isa = PBXTextBookmark;
+		fRef = 4FD16CA013B6327C001D0217 /* app_main.cpp */;
+		name = "app_main.cpp: 1";
+		rLen = 0;
+		rLoc = 0;
+		rType = 0;
+		vrLen = 928;
+		vrLoc = 87;
+	};
+}

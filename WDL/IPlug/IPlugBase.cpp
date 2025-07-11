@@ -404,6 +404,10 @@ void IPlugBase::SetOutputChannelConnections(int idx, int n, bool connected)
 
 bool IPlugBase::IsInChannelConnected(int chIdx)
 {
+  int chans = mInChannels.GetSize();
+  for(int i = 0; i  < chans; i++) {
+    bool connected = mInChannels.Get(i)->mConnected;
+  }
   return (chIdx < mInChannels.GetSize() && mInChannels.Get(chIdx)->mConnected);
 }
 
