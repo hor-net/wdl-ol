@@ -8,6 +8,13 @@
 #include "pluginterfaces/base/ibstream.h"
 #include "pluginterfaces/vst/ivstparameterchanges.h"
 #include "pluginterfaces/vst/ivstevents.h"
+#include "pluginterfaces/base/conststringtable.h"
+
+#include <algorithm> // Added for std::find
+
+// Force VST3 namespace resolution
+using Steinberg::Vst::ColorSpec;
+
 
 IPlugVST3::IPlugVST3(IPlugInstanceInfo instanceInfo,
 										 int nParams,
@@ -189,15 +196,17 @@ tresult PLUGIN_API IPlugVST3::initialize (FUnknown* context)
 			{
 				flags |= ParameterInfo::kCanAutomate;
 			}
-			
+	
+#define STR16n(x) Steinberg::ConstStringTable::instance ()->getString (x)
+
 			switch (p->Type())
 			{
 				case IParam::kTypeDouble:
 				case IParam::kTypeInt:
 				{
-					Parameter* param = new RangeParameter( STR16(p->GetNameForHost()),
+					Parameter* param = new RangeParameter( STR16n(p->GetNameForHost()),
 																								i,
-																								STR16(p->GetLabelForHost()),
+																								STR16n(p->GetLabelForHost()),
 																								p->GetMin(),
 																								p->GetMax(),
 																								p->GetDefault(),
@@ -213,9 +222,9 @@ tresult PLUGIN_API IPlugVST3::initialize (FUnknown* context)
 				case IParam::kTypeEnum:
 				case IParam::kTypeBool:
 				{
-					StringListParameter* param = new StringListParameter (STR16(p->GetNameForHost()),
+					StringListParameter* param = new StringListParameter (STR16n(p->GetNameForHost()),
 																																i,
-																																STR16(p->GetLabelForHost()),
+																																STR16n(p->GetLabelForHost()),
 																																flags | ParameterInfo::kIsList,
 																																unitID);
 					
@@ -225,7 +234,7 @@ tresult PLUGIN_API IPlugVST3::initialize (FUnknown* context)
 					
 					for (int j=0; j<nDisplayTexts; j++)
 					{
-						param->appendString(STR16(p->GetDisplayText(j)));
+						param->appendString(STR16n(p->GetDisplayText(j)));
 					}
 					
 					parameters.addParameter(param);
@@ -269,7 +278,7 @@ tresult PLUGIN_API IPlugVST3::terminate ()
 {
 	TRACE;
 	
-	viewsArray.removeAll();
+	viewsArray.clear();
 	return SingleComponentEffect::terminate();
 }
 
@@ -296,7 +305,9 @@ tresult PLUGIN_API IPlugVST3::setBusArrangements(SpeakerArrangement* inputs, int
 	// if existing input bus has a different number of channels to the input bus being connected
 	if (bus && SpeakerArr::getChannelCount(bus->getArrangement()) != reqNumInputChannels)
 	{
-		audioInputs.remove(bus);
+		auto it = std::find(audioInputs.begin(), audioInputs.end(), bus);
+		if (it != audioInputs.end())
+			audioInputs.erase(it);
 		addAudioInput(USTRING("Input"), getSpeakerArrForChans(reqNumInputChannels));
 	}
 	
@@ -305,7 +316,10 @@ tresult PLUGIN_API IPlugVST3::setBusArrangements(SpeakerArrangement* inputs, int
 	// if existing output bus has a different number of channels to the output bus being connected
 	if (bus && SpeakerArr::getChannelCount(bus->getArrangement()) != reqNumOutputChannels)
 	{
-		audioOutputs.remove(bus);
+		// audioOutputs.remove(bus);
+		auto it = std::find(audioOutputs.begin(), audioOutputs.end(), bus);
+		if (it != audioOutputs.end())
+			audioOutputs.erase(it);
 		addAudioOutput(USTRING("Output"), getSpeakerArrForChans(reqNumOutputChannels));
 	}
 	
@@ -322,7 +336,10 @@ tresult PLUGIN_API IPlugVST3::setBusArrangements(SpeakerArrangement* inputs, int
 		
 		if (bus && SpeakerArr::getChannelCount(bus->getArrangement()) != reqNumSideChainChannels)
 		{
-			audioInputs.remove(bus);
+			// audioInputs.remove(bus);
+			auto it = std::find(audioInputs.begin(), audioInputs.end(), bus);
+			if (it != audioInputs.end())
+				audioInputs.erase(it);
 			addAudioInput(USTRING("Sidechain Input"), getSpeakerArrForChans(reqNumSideChainChannels), kAux, 0); // either mono or stereo
 		}
 		
@@ -816,16 +833,16 @@ tresult PLUGIN_API IPlugVST3::getParamValueByString (ParamID tag, TChar* string,
 
 void IPlugVST3::addDependentView(IPlugVST3View* view)
 {
-	viewsArray.add(view);
+	viewsArray.push_back(view);
 }
 
 void IPlugVST3::removeDependentView(IPlugVST3View* view)
 {
-	for (int32 i = 0; i < viewsArray.total(); i++)
+	for (int32 i = 0; i < viewsArray.size(); i++)
 	{
 		if (viewsArray.at(i) == view)
 		{
-			viewsArray.removeAt(i);
+			viewsArray.erase(viewsArray.begin() + i);
 			break;
 		}
 	}
@@ -876,7 +893,7 @@ SpeakerArrangement IPlugVST3::getSpeakerArrForChans(int32 chans)
 		case 3:
 			return SpeakerArr::k30Music;
 		case 4:
-			return SpeakerArr::kBFormat1stOrder;
+			return SpeakerArr::k40Music;
 		case 5:
 			return SpeakerArr::k50;
 		case 6:
@@ -1191,3 +1208,4 @@ void IPlugVST3View::resize(int w, int h)
 	mExpectingNewSize = true;
 	plugFrame->resizeView(this, &newSize);
 }
+

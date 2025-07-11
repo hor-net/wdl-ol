@@ -22,7 +22,7 @@ using namespace Vst;
 class IPlugVST3View;
 
 class IPlugVST3 : public IPlugBase
-, public IUnitInfo
+//, public IUnitInfo
 , public SingleComponentEffect
 , public IMidiMapping
 {
@@ -150,7 +150,7 @@ private:
 	bool mSidechainActive;
 	//  IMidiQueue mMidiOutputQueue;
 	ProcessContext mProcessContext;
-	TArray <IPlugVST3View*> viewsArray;
+	std::vector <IPlugVST3View*> viewsArray;
 	
 	friend class IPlugVST3View;
 };
