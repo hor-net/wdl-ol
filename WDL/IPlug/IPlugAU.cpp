@@ -1,5 +1,5 @@
 #include "IPlugAU.h"
-#include "IGraphicsMac.h"
+#include "IGraphicsMac.h"  // Needed for MakeCFString, CFStrLocal, CStrLocal helpers
 #include "Log.h"
 #include "Hosts.h"
 
@@ -1659,7 +1659,7 @@ OSStatus IPlugAU::RenderProc(void* pPlug, AudioUnitRenderActionFlags* pFlags, co
 				// they are unconnected for mono tracks)
 				_this->SetInputChannelConnections(0, _this->NInChannels(), false);
 				_this->SetInputChannelConnections(pInBus->mPlugChannelStartIdx, pInBus->mNHostChannels, true);
-        for (int i = 0, chIdx = pInBus->mPlugChannelStartIdx; i < pInBus->mNHostChannels; ++i, ++chIdx)
+        for (int i = 0, chIdx = pInBufList->mNumberBuffers; i < pInBus->mNHostChannels; ++i, ++chIdx)
         {
           _this->AttachInputBuffers(chIdx, 1, (AudioSampleType**) &(pInBufList->mBuffers[i].mData), nFrames);
         }

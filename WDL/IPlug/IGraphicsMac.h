@@ -12,6 +12,8 @@
 
 #include "IGraphics.h"
 #include "../swell/swell.h"
+#include <CoreFoundation/CoreFoundation.h>
+#include <CoreGraphics/CoreGraphics.h>
 
 #ifdef VST3_API
   #define _UINT32 // this is necessary to get VST3 to compile with the 10.6 SDK due to a conflict
@@ -143,7 +145,7 @@ public: //TODO: make this private
   void* mHostNSWindow;
 };
 
-#ifndef IPLUG_NO_CARBON_SUPPORT
+//#ifndef IPLUG_NO_CARBON_SUPPORT
 inline CFStringRef MakeCFString(const char* cStr)
 {
   return CFStringCreateWithCString(0, cStr, kCFStringEncodingUTF8);
@@ -182,7 +184,7 @@ inline CGRect ToCGRect(int h, IRECT* pR)
   int B = h - pR->B;
   return CGRectMake(pR->L, B, pR->W(), B + pR->H());
 }
-#endif
+//#endif
 
 inline int AdjustFontSize(int size)
 {
